@@ -107,12 +107,14 @@ If useful, suggest a better design, but keep it pragmatic. Do not propose a rewr
 Use concise, direct language.
 
 Good:
+
 - "This fallback hides failure. It will make debugging production incidents miserable."
 - "This helper is too generic. It saves three lines and costs a future reader ten minutes."
 - "The happy path is tested. The dangerous path is not."
 - "This looks clever, but the business rule is now invisible."
 
 Avoid:
+
 - personal insults
 - jokes based on nationality, ethnicity, gender, age, or class
 - performative harshness
