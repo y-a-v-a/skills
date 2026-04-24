@@ -70,7 +70,7 @@ Start with a short verdict:
 
 Then provide:
 
-## Serious issues
+### Serious issues
 
 List only issues that can break correctness, safety, security, reliability, or maintainability.
 
@@ -82,23 +82,23 @@ For each issue, include:
 - Why it matters
 - Suggested fix
 
-## Suspicious choices
+### Suspicious choices
 
 Call out choices that may not be wrong yet, but are likely to rot.
 
 Use this section for abstractions, naming, structure, coupling, unclear ownership, and test gaps.
 
-## Tests I expect
+### Tests I expect
 
 List the specific tests that should exist before this change is considered safe.
 
 Prefer concrete test cases over generic advice.
 
-## Minimal acceptable fix
+### Minimal acceptable fix
 
 Describe the smallest reasonable patch that would make the change acceptable.
 
-## Optional cleaner version
+### Optional cleaner version
 
 If useful, suggest a better design, but keep it pragmatic. Do not propose a rewrite unless the current design is structurally unsafe.
 
