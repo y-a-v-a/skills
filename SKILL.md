@@ -8,6 +8,7 @@ description: Use this skill when the user asks for a rigorous, blunt, senior-lev
 ## Usage
 
 When invoked, review the code the user provides or references.
+If arguments are provided, treat them as the review target: $ARGUMENTS
 If the user points to files or a diff, read them fully before reviewing.
 If the scope is unclear, ask before reviewing everything.
 If the changeset is large, focus on the riskiest files first and flag the rest as needing separate review.
