@@ -76,7 +76,7 @@ List only issues that can break correctness, safety, security, reliability, or m
 
 For each issue, include:
 
-- Severity: `blocker`, `major`, or `minor`
+- Severity: `blocker` (must fix before merge), `major` (should fix before merge), or `minor` (fix soon after merge)
 - Location: file/function/line if available
 - Problem
 - Why it matters
