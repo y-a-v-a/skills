@@ -31,6 +31,17 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/html`** — Export the current "situation" — the state of the conversation, work done, findings, or data — to a self-contained `index.html` you can open in a browser. The agent decides what is most valuable to capture; the output is a single file with inline CSS and no external dependencies, and it never overwrites (falls back to `index1.html`, `index2.html`, …).
 
+## Installing
+
+Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
+
+```bash
+./link-skill.sh --all      # link every skill
+./link-skill.sh html       # link just one skill
+```
+
+Each skill is linked under its own name (e.g. `~/.claude/skills/html`), taken from the skill's `name:` frontmatter, so nested skills like `codex` and `google-search` land under the right name. Pass `--force` to replace an existing entry, and set `CLAUDE_SKILLS_DIR` to target a different directory.
+
 ## Author
 
 Vincent Bruijn · [vebruijn@gmail.com](mailto:vebruijn@gmail.com) · [Buy me a coffee ☕](https://buymeacoffee.com/y4v4)
