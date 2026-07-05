@@ -1,6 +1,10 @@
 ---
 name: google-search
 description: Search the web using Google Programmable Search Engine. Use when you need to search for information online with custom search engine configuration.
+license: MIT
+metadata:
+  author: Vincent Bruijn
+  author-url: https://vincentbruijn.nl
 allowed-tools:
   - Bash
 user-invocable: true

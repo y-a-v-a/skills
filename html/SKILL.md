@@ -1,6 +1,10 @@
 ---
 name: html
 description: Use this skill when the user wants to export the current "situation" — the state of the conversation, work done, findings, data, or context — to a standalone HTML file they can open in a browser. The agent decides what is most valuable to capture and visualize. Invoked as /html, optionally with hints about what to focus on.
+license: MIT
+metadata:
+  author: Vincent Bruijn
+  author-url: https://vincentbruijn.nl
 ---
 
 # HTML Export

@@ -1,6 +1,10 @@
 ---
 name: codex-review
 description: Run a code review using OpenAI Codex CLI. Analyzes uncommitted changes or diffs against a base branch.
+license: MIT
+metadata:
+  author: Vincent Bruijn
+  author-url: https://vincentbruijn.nl
 argument-hint: [--uncommitted | --base <branch> | --commit <sha>]
 context: fork
 agent: Explore

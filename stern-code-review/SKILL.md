@@ -1,6 +1,10 @@
 ---
 name: stern-code-review
 description: Use this skill when the user asks for a rigorous, blunt, senior-level code review focused on correctness, maintainability, production risk, unnecessary abstraction, weak tests, security issues, and operational failure modes. Do not use it for brainstorming, greenfield implementation, or purely stylistic feedback.
+license: MIT
+metadata:
+  author: Vincent Bruijn
+  author-url: https://vincentbruijn.nl
 ---
 
 # Stern Code Review

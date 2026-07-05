@@ -1,6 +1,10 @@
 ---
 name: attribution
 description: Use this skill when the user wants to add author attribution to a project, for example to a README.md or as a footer on a website. Handles bare invocation (falls back to git config), explicit name/email/website arguments, and free-form placement instructions.
+license: MIT
+metadata:
+  author: Vincent Bruijn
+  author-url: https://vincentbruijn.nl
 ---
 
 # Attribution
