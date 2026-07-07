@@ -40,9 +40,10 @@ Rules for the page:
 
 - Canvas is exactly 1280×640: `html,body{margin:0}` and a single
   `1280×640` container with `overflow:hidden`. No scrollbars, no page margins.
-- **Safe area**: keep the name, tagline, and anything essential at least **40px
+- **Safe area**: keep the name, tagline, and anything essential at least **40pt
   from every edge** (GitHub's own template rule — edges get cropped on some
-  surfaces). Decorative elements may bleed to the edges.
+  surfaces). At CSS 96dpi that is ~53px on the 1280×640 canvas; use **≥ 54px**
+  insets. Decorative elements may bleed to the edges.
 - Default composition: project **name** large, the **tagline** under it, plus a
   **decorative motif in the project's visual language** (shapes, gradients,
   patterns echoing the app's theme). No GitHub logo, no URL, no clutter.

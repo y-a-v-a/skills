@@ -31,6 +31,18 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/html`** — Export the current "situation" — the state of the conversation, work done, findings, or data — to a self-contained `index.html` you can open in a browser. The agent decides what is most valuable to capture; the output is a single file with inline CSS and no external dependencies, and it never overwrites (falls back to `index1.html`, `index2.html`, …).
 
+### 🔥 [Grill Me](./grill-me)
+
+- **`/grill-me`** — Get interviewed relentlessly about a plan or design until you and the agent reach shared understanding. Walks down each branch of the decision tree one question at a time, resolving dependencies between decisions, and offers a recommended answer with every question. Questions answerable from the codebase are answered by exploring it instead of asking.
+
+### 📝 [Strunk](./strunk)
+
+- **`/strunk`** — Rewrite prose to conform to William Strunk Jr.'s *The Elements of Style* (1918). Takes a file path or inline text and prints only the rewritten text — no commentary. Applies all chapters (punctuation, composition, the misused-words list, spelling) at moderate aggressiveness: tightens, activates, and cuts while preserving meaning, paragraph order, and the author's claims. Code, URLs, and quoted speech pass through verbatim; dated 1918 rules (singular *they*, *shall*/*will*) are applied with judgment.
+
+### 📸 [Social Preview](./social-preview)
+
+- **`/social-preview`** — Generate a GitHub social preview image (1280×640 PNG) for the current repo. Builds a throwaway HTML card styled after the project's own look (theme colors, fonts, layout) with a short tagline from the README, screenshots it with headless Chrome, and iterates until you approve. Keeps essentials inside GitHub's 40pt safe area and verifies the exact output size. See [explainer.html](./social-preview/explainer.html) for a visual walkthrough.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>social-preview — skill explainer</title>
+<style>
+  :root {
+    font-size: 16px;
+    --bg: #f7f6f3;
+    --card: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --accent: #A2195B;
+    --accent-soft: #f8e3ee;
+    --line: #e4e2dc;
+    --code-bg: #efede8;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181c;
+      --card: #1e2126;
+      --ink: #e8e6e1;
+      --muted: #9a9a94;
+      --accent: #e06ba6;
+      --accent-soft: #3b1130;
+      --line: #2c3038;
+      --code-bg: #14161a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  main { max-width: 46em; margin: 0 auto; padding: 3em 1.5em 4em; }
+
+  header h1 {
+    font-size: 2.2em;
+    line-height: 1.15;
+    margin: 0 0 0.3em;
+    letter-spacing: -0.02em;
+  }
+  header h1 code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0.08em 0.3em;
+    border-radius: 0.25em;
+    font-size: 0.9em;
+  }
+  .lede { font-size: 1.15em; color: var(--muted); margin: 0 0 2.5em; }
+
+  /* ---- demo card ---- */
+  .demo {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    border-radius: 0.6em;
+    overflow: hidden;
+    background: linear-gradient(135deg, #A2195B, #832370 55%, #652D86);
+    color: #fdf2f8;
+    box-shadow: 0 0.6em 2em rgba(0,0,0,0.18);
+    margin: 0 0 0.8em;
+  }
+  .demo .safe {
+    position: absolute;
+    inset: 8.44% 4.22%;               /* 40pt ≈ 54px on a 1280×640 canvas */
+    border: 1px dashed rgba(255,255,255,0.45);
+    border-radius: 0.3em;
+    pointer-events: none;
+  }
+  .demo .safe::after {
+    content: "40pt safe area";
+    position: absolute;
+    top: 0.4em; right: 0.6em;
+    font-size: 0.7em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+  }
+  .demo .content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 9%;
+  }
+  .demo .name {
+    font-size: clamp(1.6em, 6vw, 3em);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .demo .tagline {
+    font-size: clamp(0.85em, 2.6vw, 1.25em);
+    color: rgba(253,242,248,0.85);
+    margin: 0.4em 0 0;
+  }
+  .demo .byline {
+    position: absolute;
+    bottom: 8%; left: 9%;
+    font-size: 0.8em;
+    color: rgba(253,242,248,0.6);
+  }
+  .demo .motif {
+    position: absolute;
+    right: -12%; top: -30%;
+    width: 55%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22), transparent 65%);
+  }
+  .caption {
+    font-size: 0.85em;
+    color: var(--muted);
+    text-align: center;
+    margin: 0 0 3em;
+  }
+
+  h2 {
+    font-size: 1.4em;
+    margin: 2.2em 0 0.8em;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---- pipeline ---- */
+  ol.pipeline { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  ol.pipeline li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 1.6em 3.2em;
+  }
+  ol.pipeline li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0.1em;
+    width: 2em; height: 2em;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ol.pipeline li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 1em; top: 2.4em; bottom: 0.2em;
+    width: 2px;
+    background: var(--line);
+  }
+  ol.pipeline strong { display: block; margin-bottom: 0.15em; }
+  ol.pipeline p { margin: 0; color: var(--muted); font-size: 0.95em; }
+
+  /* ---- rules grid ---- */
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14em, 1fr));
+    gap: 1em;
+    margin: 1.2em 0 0;
+  }
+  .rule {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 0.6em;
+    padding: 1em 1.1em;
+  }
+  .rule h3 { font-size: 1em; margin: 0 0 0.3em; }
+  .rule p { font-size: 0.9em; color: var(--muted); margin: 0; }
+
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 0.25em;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 0.6em;
+    padding: 1em 1.2em;
+    overflow-x: auto;
+    font-size: 0.85em;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+
+  .note {
+    border-left: 0.25em solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 0.4em 0.4em 0;
+    padding: 0.8em 1.1em;
+    margin: 2.5em 0 0;
+    font-size: 0.95em;
+  }
+  .note strong { color: var(--accent); }
+
+  footer {
+    margin-top: 3.5em;
+    padding-top: 1.2em;
+    border-top: 1px solid var(--line);
+    font-size: 0.85em;
+    color: var(--muted);
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1><code>social-preview</code></h1>
+    <p class="lede">A Claude Code skill that turns your repo into a polished GitHub social preview image — a 1280×640 PNG in the project's own visual language, ready for the repo card on X, Slack, and anywhere else the link unfurls.</p>
+  </header>
+
+  <div class="demo" role="img" aria-label="Mock social preview card with safe-area guides">
+    <div class="motif"></div>
+    <div class="safe"></div>
+    <div class="content">
+      <p class="name">your-project</p>
+      <p class="tagline">One line that says what it does.</p>
+    </div>
+    <p class="byline">by You</p>
+  </div>
+  <p class="caption">The anatomy of every card: big name, short tagline, quiet byline, decorative motif — all inside the 40pt safe area.</p>
+
+  <h2>How it works</h2>
+  <ol class="pipeline">
+    <li>
+      <strong>Read the repo</strong>
+      <p>Scans <code>README.md</code> and <code>package.json</code> for what the project is, and distills a tagline of ≤ 60 characters. For webapps it also reads the CSS and HTML to pick up theme colors, fonts, and layout idioms.</p>
+    </li>
+    <li>
+      <strong>Write a throwaway HTML card</strong>
+      <p>A single 1280×640 page in the scratchpad — never in your repo. The design echoes the project's own look; CLIs and libraries get a tasteful typographic card instead.</p>
+    </li>
+    <li>
+      <strong>Screenshot with headless Chrome</strong>
+      <p>One command, no dependencies installed, nothing built. The output size is verified with <code>sips</code> — exactly 1280×640 or it doesn't ship.</p>
+    </li>
+    <li>
+      <strong>Iterate until you approve</strong>
+      <p>You see the PNG, react, the HTML gets tweaked, re-shot, resent. When approved, the throwaway HTML is deleted and <code>social-preview.png</code> stays in the repo root.</p>
+    </li>
+  </ol>
+
+  <h2>The rules baked in</h2>
+  <div class="rules">
+    <div class="rule">
+      <h3>Exact canvas</h3>
+      <p>1280×640, GitHub's recommended size. No scrollbars, no margins, verified after every shot.</p>
+    </div>
+    <div class="rule">
+      <h3>40pt safe area</h3>
+      <p>Name, tagline, and byline stay 40pt (~54px on the canvas) from every edge — some surfaces crop. Decoration may bleed.</p>
+    </div>
+    <div class="rule">
+      <h3>Legible at half size</h3>
+      <p>Cards usually render at 640×320 on retina screens, so even the smallest text is ≥ 28px on the canvas.</p>
+    </div>
+    <div class="rule">
+      <h3>Your project's look</h3>
+      <p>Theme colors, fonts, and motifs come from the repo itself — not from a generic template.</p>
+    </div>
+  </div>
+
+  <h2>The screenshot command</h2>
+  <pre><code>"$CHROME" --headless --disable-gpu \
+  --screenshot="&lt;repo&gt;/social-preview.png" \
+  --window-size=1280,640 \
+  --force-device-scale-factor=1 \
+  --hide-scrollbars \
+  --virtual-time-budget=5000 \
+  "file:///&lt;scratchpad&gt;/social-preview.html"</code></pre>
+
+  <div class="note">
+    <strong>One manual step remains:</strong> GitHub has no API for social previews. Upload the PNG by hand at <em>Settings → General → Social preview</em>.
+  </div>
+
+  <footer>
+    Part of the <a href="https://github.com/y-a-v-a/skills">skills</a> collection by Vincent Bruijn · MIT
+  </footer>
+</main>
+</body>
+</html>
