@@ -43,6 +43,10 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/social-preview`** — Generate a GitHub social preview image (1280×640 PNG) for the current repo. Builds a throwaway HTML card styled after the project's own look (theme colors, fonts, layout) with a short tagline from the README, screenshots it with headless Chrome, and iterates until you approve. Keeps essentials inside GitHub's 40pt safe area and verifies the exact output size. See [explainer.html](./social-preview/explainer.html) for a visual walkthrough.
 
+### 🚀 [Ambitious](./ambitious)
+
+- **`/ambitious`** — Challenge both you and the agent to aim higher on a task, prompt, or plan. Based on Felix Rieseberg's [How to be more ambitious: A tutorial for humans with models](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/). It names the small version you asked for, then pushes along three axes: **Altitude** (the goal beyond the goal), **Depth** (the raw material, real instruments, and outside judge a field-leading expert would use), and **Range** (nouns turned into verbs, plus a crew from other fields applying their actual methods rather than role-playing). It asks pointed questions about where your framing caps the outcome, audits its own answer for the ways models undershoot, and then works at whichever level you choose.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
