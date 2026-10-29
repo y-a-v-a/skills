@@ -51,6 +51,10 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/scpush`** — A minimal stage, commit, and push. Stages only the files that belong to the current work, by name, and skips secrets, build output, and unrelated edits (and says what it skipped). It commits in the style of the recent log, pushes to the branch's upstream (setting one if missing), and reports the hash and branch in one line. It's the lightweight counterpart of `/gg`.
 
+### 🚢 [gg](./gg)
+
+- **`/gg`** — Stage, commit, and push in one pass, with more safeguards. It reads every untracked file before staging and refuses secrets, build output, editor cruft, and large or unmentioned binaries. It stages explicit paths only, shows what it staged, writes the message in the repository's own style, and reports the short SHA. `/gg <message>` sets the subject, and `/gg <path>…` limits what gets staged. It never force-pushes, never bypasses hooks, and stops when the repository is mid-merge, mid-rebase, or detached.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
