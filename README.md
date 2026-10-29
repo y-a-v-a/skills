@@ -47,6 +47,10 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/ambitious`** — Challenge both you and the agent to aim higher on a task, prompt, or plan. Based on Felix Rieseberg's [How to be more ambitious: A tutorial for humans with models](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/). It names the small version you asked for, then pushes along three axes: **Altitude** (the goal beyond the goal), **Depth** (the raw material, real instruments, and outside judge a field-leading expert would use), and **Range** (nouns turned into verbs, plus a crew from other fields applying their actual methods rather than role-playing). It asks pointed questions about where your framing caps the outcome, audits its own answer for the ways models undershoot, and then works at whichever level you choose.
 
+### 📦 [Scpush](./scpush)
+
+- **`/scpush`** — A minimal stage, commit, and push. Stages only the files that belong to the current work, by name, and skips secrets, build output, and unrelated edits (and says what it skipped). It commits in the style of the recent log, pushes to the branch's upstream (setting one if missing), and reports the hash and branch in one line. It's the lightweight counterpart of `/gg`.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
