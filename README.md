@@ -55,6 +55,10 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/gg`** — Stage, commit, and push in one pass, with more safeguards. It reads every untracked file before staging and refuses secrets, build output, editor cruft, and large or unmentioned binaries. It stages explicit paths only, shows what it staged, writes the message in the repository's own style, and reports the short SHA. `/gg <message>` sets the subject, and `/gg <path>…` limits what gets staged. It never force-pushes, never bypasses hooks, and stops when the repository is mid-merge, mid-rebase, or detached.
 
+### ✉️ [Sendmail](./sendmail)
+
+- **`/sendmail`** — Prepare a draft email in Microsoft Outlook on macOS through `osascript`, for example `/sendmail kim@example.com ask Kim for the Q3 numbers`. Email addresses in the arguments become recipients. The rest is either a literal body, used verbatim, or an instruction the agent writes the body from, using only facts from the conversation. The subject is derived from the body. The draft opens in Outlook for review; it never sends.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
