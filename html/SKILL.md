@@ -45,9 +45,11 @@ and top-level heading that reflect the actual situation, not "HTML Export".
   `<style>` block, no external stylesheets, fonts, scripts, or CDN links,
   so it opens correctly offline with a single click.
 - Make it clean and readable: a constrained content width (e.g.
-  `max-width: 800px; margin: auto`), comfortable line height, system font
+  `max-width: 1024px; margin: auto`), comfortable line height, system font
   stack, sensible spacing, and styled tables/code blocks. Keep it tasteful,
   not flashy.
+- Use a default font size of 16px and use `em` font sizes throughout, but
+  do not use font sizes below `1em`.
 - If a visualization genuinely helps (timeline, flow, simple chart), draw
   it with inline SVG or CSS rather than pulling in a library.
 - Ensure the markup is valid and the document is complete
