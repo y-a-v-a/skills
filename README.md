@@ -59,6 +59,10 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/sendmail`** — Prepare a draft email in Microsoft Outlook on macOS through `osascript`, for example `/sendmail kim@example.com ask Kim for the Q3 numbers`. Email addresses in the arguments become recipients. The rest is either a literal body, used verbatim, or an instruction the agent writes the body from, using only facts from the conversation. The subject is derived from the body. The draft opens in Outlook for review; it never sends.
 
+### 🧹 [Purge](./purge)
+
+- **`/flushcache`** — Purge Akamai edge cache through the [Akamai CLI](https://github.com/akamai/cli). `/flushcache https://example.com` invalidates that URL on production; CP codes and cache tags are recognized from the arguments, and `--staging` and `--delete` switch network and operation. Verifies the CLI and `~/.edgerc` credentials before running (with setup instructions when they are missing), and asks first whenever the blast radius is wider than a handful of URLs.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
