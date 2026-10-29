@@ -63,6 +63,10 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/flushcache`** — Purge Akamai edge cache through the [Akamai CLI](https://github.com/akamai/cli). `/flushcache https://example.com` invalidates that URL on production; CP codes and cache tags are recognized from the arguments, and `--staging` and `--delete` switch network and operation. Verifies the CLI and `~/.edgerc` credentials before running (with setup instructions when they are missing), and asks first whenever the blast radius is wider than a handful of URLs.
 
+### ⚡ [JFDI](./jfdi)
+
+- **`/jfdi`** — "Just do it": work autonomously to a high standard. The agent decides based on verified facts instead of asking, finishes the whole job, proves it works with tests and builds, and reviews its own diff before reporting. It still stops at hard stops (destructive, outward-facing, security or compliance, real ambiguity), but only after finishing all safe work, and then asks once with a recommendation for each question. Critically important decisions (and only those) go into a decision record: the project's own ADR directory if it has one, otherwise `DECISIONS.md`.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
