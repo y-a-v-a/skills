@@ -8,64 +8,64 @@ A set of [pi](https://github.com/mariozechner/pi-coding-agent) / Claude Code ski
 
 Two skills that delegate work to the [OpenAI Codex CLI](https://developers.openai.com/codex/cli):
 
-- **`/codex`** — Delegate coding tasks (generation, refactoring, debugging) to Codex. Gathers context first, then runs `codex exec`, and reports a summary of what changed.
-- **`/codex-review`** — Run code reviews via `codex review`. Supports reviewing uncommitted changes, diffs against a base branch, or specific commits.
+- **`/codex`** — Hand a coding task (generation, refactoring, debugging) to `codex exec`, after gathering context, and summarize what changed.
+- **`/codex-review`** — Run `codex review` on uncommitted changes, a diff against a base branch, or a specific commit.
 
 ### 🔍 [Google Programmable Search Engine](./gpse-skill)
 
-- **`/google-search`** — Search the web using Google's Custom Search API. Supports date filtering, site-specific search, exact phrase matching, exclusions, and pagination. Zero external dependencies — plain Node.js with native `fetch`.
-
-Requires a Google API key and Programmable Search Engine ID (free tier: 100 queries/day).
+- **`/google-search`** — Search the web through Google's Custom Search API, with date, site, exact-phrase, and exclusion filters plus pagination. Plain Node.js, no dependencies. Needs an API key and search engine ID (free tier: 100 queries/day).
 
 ### 🧐 [Stern Code Review](./stern-code-review)
 
-- **`/stern-code-review`** — A rigorous, senior-engineer-style code review focused on correctness, data safety, security, and operational reliability. Produces a structured verdict (`approve` / `approve with fixes` / `request changes` / `reject`) with serious issues, suspicious choices, expected tests, and a minimal acceptable fix.
-
-Direct, practical, and unsentimental — assumes the code will run in production and edge cases matter.
+- **`/stern-code-review`** — A blunt, senior-level review focused on correctness, data safety, security, and production risk. Ends in a verdict (`approve` / `approve with fixes` / `request changes` / `reject`), the tests that should exist, and the minimal acceptable fix.
 
 ### ✍️ [Attribution](./attribution)
 
-- **`/attribution`** — Add author attribution to a project (e.g. `README.md` or a website footer). With no arguments it falls back to `git config user.name`; arguments can supply a name, email, and/or website, plus a free-form placement instruction (e.g. `/attribution Vincent Bruijn, add name to html page footer`). Defaults to a copyright-style credit with the current year and never silently overwrites an existing attribution.
+- **`/attribution`** — Add a copyright-style author credit to `README.md` or wherever you say (e.g. `/attribution Vincent Bruijn, add name to html page footer`). Falls back to `git config user.name` and never silently replaces an existing credit.
 
 ### 🖼️ [HTML Export](./html)
 
-- **`/html`** — Export the current "situation" — the state of the conversation, work done, findings, or data — to a self-contained `index.html` you can open in a browser. The agent decides what is most valuable to capture; the output is a single file with inline CSS and no external dependencies, and it never overwrites (falls back to `index1.html`, `index2.html`, …).
+- **`/html`** — Export the current state of the session (work done, findings, data) to a self-contained `index.html`. The agent picks what is worth showing, and it never overwrites a file (`index1.html`, `index2.html`, …).
 
 ### 🔥 [Grill Me](./grill-me)
 
-- **`/grill-me`** — Get interviewed relentlessly about a plan or design until you and the agent reach shared understanding. Walks down each branch of the decision tree one question at a time, resolving dependencies between decisions, and offers a recommended answer with every question. Questions answerable from the codebase are answered by exploring it instead of asking.
+- **`/grill-me`** — Get interviewed about a plan or design, one question at a time, each with a recommended answer, until you reach shared understanding. Questions the codebase can answer get answered from the codebase.
 
 ### 📝 [Strunk](./strunk)
 
-- **`/strunk`** — Rewrite prose to conform to William Strunk Jr.'s *The Elements of Style* (1918). Takes a file path or inline text and prints only the rewritten text — no commentary. Applies all chapters (punctuation, composition, the misused-words list, spelling) at moderate aggressiveness: tightens, activates, and cuts while preserving meaning, paragraph order, and the author's claims. Code, URLs, and quoted speech pass through verbatim; dated 1918 rules (singular *they*, *shall*/*will*) are applied with judgment.
+- **`/strunk`** — Rewrite prose (a file or inline text) to follow Strunk's *The Elements of Style*, and print only the result. Tightens and cuts while keeping meaning and claims. Code, URLs, and quotes pass through untouched.
 
 ### 📸 [Social Preview](./social-preview)
 
-- **`/social-preview`** — Generate a GitHub social preview image (1280×640 PNG) for the current repo. Builds a throwaway HTML card styled after the project's own look (theme colors, fonts, layout) with a short tagline from the README, screenshots it with headless Chrome, and iterates until you approve. Keeps essentials inside GitHub's 40pt safe area and verifies the exact output size. See [explainer.html](./social-preview/explainer.html) for a visual walkthrough.
+- **`/social-preview`** — Create a 1280×640 GitHub social preview PNG in the project's own style, screenshot it with headless Chrome, and iterate until you approve. See [explainer.html](./social-preview/explainer.html).
 
 ### 🚀 [Ambitious](./ambitious)
 
-- **`/ambitious`** — Challenge both you and the agent to aim higher on a task, prompt, or plan. Based on Felix Rieseberg's [How to be more ambitious: A tutorial for humans with models](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/). It names the small version you asked for, then pushes along three axes: **Altitude** (the goal beyond the goal), **Depth** (the raw material, real instruments, and outside judge a field-leading expert would use), and **Range** (nouns turned into verbs, plus a crew from other fields applying their actual methods rather than role-playing). It asks pointed questions about where your framing caps the outcome, audits its own answer for the ways models undershoot, and then works at whichever level you choose.
+- **`/ambitious`** — Push a task toward its most ambitious worthwhile version, using Felix Rieseberg's [Altitude, Depth, and Range](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/) lenses. Challenges your framing and the agent's own undershooting, rewrites the ask, then works at the level you pick.
 
 ### 📦 [Scpush](./scpush)
 
-- **`/scpush`** — A minimal stage, commit, and push. Stages only the files that belong to the current work, by name, and skips secrets, build output, and unrelated edits (and says what it skipped). It commits in the style of the recent log, pushes to the branch's upstream (setting one if missing), and reports the hash and branch in one line. It's the lightweight counterpart of `/gg`.
+- **`/scpush`** — Minimal stage, commit, and push: stages only files that belong to the current work, commits in the style of the recent log, and reports the hash. The lightweight counterpart of `/gg`.
 
 ### 🚢 [gg](./gg)
 
-- **`/gg`** — Stage, commit, and push in one pass, with more safeguards. It reads every untracked file before staging and refuses secrets, build output, editor cruft, and large or unmentioned binaries. It stages explicit paths only, shows what it staged, writes the message in the repository's own style, and reports the short SHA. `/gg <message>` sets the subject, and `/gg <path>…` limits what gets staged. It never force-pushes, never bypasses hooks, and stops when the repository is mid-merge, mid-rebase, or detached.
+- **`/gg`** — Stage, commit, and push with more safeguards. Reads untracked files first, refuses secrets and build output, stages explicit paths only, and shows what it staged. Optional message or paths as arguments. Never force-pushes or bypasses hooks.
+
+### 🔐 [Scan Secrets](./scan-secrets)
+
+- **`/scan-secrets`** — Find plaintext secrets (cloud keys, API tokens, passwords, private keys) in a repository. Uses a built-in Node.js scanner, plus [gitleaks](https://github.com/gitleaks/gitleaks) for gitignored files and the full git history when it is installed. Read-only, and every value in the output is masked.
 
 ### ✉️ [Sendmail](./sendmail)
 
-- **`/sendmail`** — Prepare a draft email in Microsoft Outlook on macOS through `osascript`, for example `/sendmail kim@example.com ask Kim for the Q3 numbers`. Email addresses in the arguments become recipients. The rest is either a literal body, used verbatim, or an instruction the agent writes the body from, using only facts from the conversation. The subject is derived from the body. The draft opens in Outlook for review; it never sends.
+- **`/sendmail`** — Draft an email in Outlook on macOS, e.g. `/sendmail kim@example.com ask Kim for the Q3 numbers`. The text is used as the body verbatim or as an instruction to write one, and the subject is derived from it. Opens the draft for review; never sends.
 
 ### 🧹 [Purge](./purge)
 
-- **`/flushcache`** — Purge Akamai edge cache through the [Akamai CLI](https://github.com/akamai/cli). `/flushcache https://example.com` invalidates that URL on production; CP codes and cache tags are recognized from the arguments, and `--staging` and `--delete` switch network and operation. Verifies the CLI and `~/.edgerc` credentials before running (with setup instructions when they are missing), and asks first whenever the blast radius is wider than a handful of URLs.
+- **`/flushcache`** — Purge Akamai edge cache for URLs, CP codes, or cache tags through the [Akamai CLI](https://github.com/akamai/cli). Invalidates on production by default (`--staging`, `--delete` to change that), checks credentials first, and asks before broad purges.
 
 ### ⚡ [JFDI](./jfdi)
 
-- **`/jfdi`** — "Just do it": work autonomously to a high standard. The agent decides based on verified facts instead of asking, finishes the whole job, proves it works with tests and builds, and reviews its own diff before reporting. It still stops at hard stops (destructive, outward-facing, security or compliance, real ambiguity), but only after finishing all safe work, and then asks once with a recommendation for each question. Critically important decisions (and only those) go into a decision record: the project's own ADR directory if it has one, otherwise `DECISIONS.md`.
+- **`/jfdi`** — "Just do it": work autonomously to a high standard. Decides from verified facts instead of asking, finishes and verifies the whole job, and only stops for destructive, outward-facing, or security-related steps. Critical decisions go into an ADR or `DECISIONS.md`.
 
 ## Installing
 
