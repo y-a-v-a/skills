@@ -67,6 +67,10 @@ Direct, practical, and unsentimental — assumes the code will run in production
 
 - **`/jfdi`** — "Just do it": work autonomously to a high standard. The agent decides based on verified facts instead of asking, finishes the whole job, proves it works with tests and builds, and reviews its own diff before reporting. It still stops at hard stops (destructive, outward-facing, security or compliance, real ambiguity), but only after finishing all safe work, and then asks once with a recommendation for each question. Critically important decisions (and only those) go into a decision record: the project's own ADR directory if it has one, otherwise `DECISIONS.md`.
 
+### 🔗 [Local URL](./local-url)
+
+- **`/local-url`** — Give a locally served web app a bookmarkable address like `http://myapp.localhost:3000`. No `/etc/hosts` entry and no sudo: `*.localhost` resolves to loopback on its own (RFC 6761). The skill checks resolution first, admits the exact name to whatever host allow-list the app has (custom middleware, Vite, webpack-dev-server, Django, Rails, Next.js), tests that a sibling name is still refused, updates the printed address and docs, restarts the running service and verifies with curl. Addresses that already worked, including a `tailscale serve` URL, keep working.
+
 ## Installing
 
 Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
