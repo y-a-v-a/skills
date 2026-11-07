@@ -129,7 +129,7 @@ Feed a diff with one obvious, specific defect and assert the review names it:
 ```bash
 printf 'def charge(amount):\n    API_KEY = "sk-live-1234567890"\n    return bill(API_KEY, amount)\n' > "$SANDBOX/pay.py"
 ( cd "$SANDBOX" && git init -q && git add pay.py && git commit -qm seed && \
-  sed -i 's/return bill/return  bill/' pay.py && git diff > review.diff )
+  printf 'def charge(amount):\n    API_KEY = "sk-live-1234567890"\n    return  bill(API_KEY, amount)\n' > pay.py && git diff > review.diff )
 cat > "$SANDBOX/rbrief.md" <<EOF
 ## Intent
 Billing helper; must not leak secrets.
@@ -214,6 +214,20 @@ as a log entry here describing what broke and what you changed.
 - Fix applied: <file(s) changed, or "none">
 - Check added/changed: <new or tightened check here, or "none">
 -->
+
+### 2026-11-07 — target: all  result: PASS
+- Suites: hooks PASS, drift PASS, codex PASS, codex-review PASS, codex-discuss PASS.
+- Context: first run after merging this repo into the `skills` repo as the
+  `codex-agent/` subtree; `~/.claude/skills/codex*` now link here. Hooks were
+  tested through those installed links (all four md5-identical). codex-cli
+  0.163.0 (last validated on 0.141.0): no flag changes broke the checks.
+- Timings: codex 43s, codex-review 13s, codex-discuss 9s (run in parallel).
+- Failure & root cause: none in the skills. §3 as written used GNU `sed -i`,
+  which errors on macOS (BSD sed takes the expression as the backup suffix),
+  so the review diff would be empty there.
+- Fix applied: none to sibling skills.
+- Check added/changed: §3 now rewrites `pay.py` with `printf` instead of
+  `sed -i`, so it builds the same diff on macOS and Linux.
 
 ### 2026-06-26 — target: drift  result: PASS (closes codex-discuss objection O5)
 - Suites: drift PASS.
