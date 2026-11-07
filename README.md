@@ -34,6 +34,10 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 - **`/grill-me`** — Get interviewed about a plan or design, one question at a time, each with a recommended answer, until you reach shared understanding. Questions the codebase can answer get answered from the codebase.
 
+### 🧭 [Guide Me](./guide-me)
+
+- **`/guide-me`** — Get walked through a manual task in a web dashboard (Vercel, AWS, GitHub settings, a DNS registrar), e.g. `/guide-me add RESEND_API_KEY to production on Vercel`. Settles scope and inputs first, checks the vendor's current docs, then gives one step at a time with a checkpoint. Re-plans when the screen doesn't match, warns before irreversible steps, and never asks for secrets in the chat.
+
 ### 📝 [Strunk](./strunk)
 
 - **`/strunk`** — Rewrite prose (a file or inline text) to follow Strunk's *The Elements of Style*, and print only the result. Tightens and cuts while keeping meaning and claims. Code, URLs, and quotes pass through untouched.
@@ -72,7 +76,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 🔗 [Local URL](./local-url)
 
-- **`/local-url`** — Give a locally served web app a bookmarkable address like `http://myapp.localhost:3000`. No `/etc/hosts` entry and no sudo: `*.localhost` resolves to loopback on its own (RFC 6761). The skill checks resolution first, admits the exact name to whatever host allow-list the app has (custom middleware, Vite, webpack-dev-server, Django, Rails, Next.js), tests that a sibling name is still refused, updates the printed address and docs, restarts the running service and verifies with curl. Addresses that already worked, including a `tailscale serve` URL, keep working.
+- **`/local-url`** — Give a locally served web app a bookmarkable address like `http://myapp.localhost:3000`, with no `/etc/hosts` entry and no sudo (`*.localhost` resolves to loopback per RFC 6761). Adds the name to the app's host allow-list, restarts it, and verifies with curl. Addresses that already worked, including a `tailscale serve` URL, keep working.
 
 ## Installing
 
