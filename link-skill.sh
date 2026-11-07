@@ -5,7 +5,9 @@
 # A "skill" is any directory in this repo that directly contains a SKILL.md.
 # The link name is taken from the skill's frontmatter `name:` field (falling
 # back to the directory name), so nested layouts like codex-agent/skills/codex
-# and gpse-skill/skill are linked under their real skill names.
+# and gpse-skill/skill are linked under their real skill names. Project-local
+# skills under a .claude/ directory (e.g. codex-agent's codex-validate) are
+# skipped, since they only work from inside their own project.
 #
 # Usage:
 #   ./link-skill.sh --all          Link every skill in the repo.
@@ -54,7 +56,7 @@ extract_name() {
 
 # Print "name<TAB>dir" for every skill directory in the repo.
 discover_skills() {
-  find "$REPO_DIR" -name SKILL.md -not -path '*/.git/*' -not -path '*/node_modules/*' \
+  find "$REPO_DIR" -name SKILL.md -not -path '*/.git/*' -not -path '*/node_modules/*' -not -path '*/.claude/*' \
     | while IFS= read -r skillmd; do
         dir="$(cd "$(dirname "$skillmd")" && pwd)"
         name="$(extract_name "$skillmd")"

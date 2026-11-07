@@ -6,10 +6,13 @@ A set of [pi](https://github.com/mariozechner/pi-coding-agent) / Claude Code ski
 
 ### 🔧 [Codex Agent](./codex-agent)
 
-Two skills that delegate work to the [OpenAI Codex CLI](https://developers.openai.com/codex/cli):
+Three skills that bring the [OpenAI Codex CLI](https://developers.openai.com/codex/cli) in as a second model, so Claude's work is not only checked by Claude:
 
-- **`/codex`** — Hand a coding task (generation, refactoring, debugging) to `codex exec`, after gathering context, and summarize what changed.
-- **`/codex-review`** — Run `codex review` on uncommitted changes, a diff against a base branch, or a specific commit.
+- **`/codex`** — Hand a coding task (generation, refactoring, debugging) to `codex exec` with a written brief of the gathered context, then verify the result against `git diff`.
+- **`/codex-review`** — Cross-model review of uncommitted changes, a diff against a base branch, or a commit. Findings are triaged by severity, and contested ones are reconciled with Codex.
+- **`/codex-discuss`** — Work through a design or plan with Codex in a shared Markdown file until you agree or record an impasse, before any code is written.
+
+The repo also includes `codex-validate`, a project-local skill that tests the three skills against a live Codex CLI. It is not linked globally.
 
 ### 🔍 [Google Programmable Search Engine](./gpse-skill)
 
