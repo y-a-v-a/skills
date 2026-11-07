@@ -69,7 +69,18 @@ the conversation, write them to `~/.edgerc` and say they should be rotated.
 
 Non-default locations are supported by the CLI and should be passed through
 when the user names them: `--edgerc <path>`, `--section <name>` (default
-`ccu`), `--accountkey <key>` for account switching.
+`ccu`), `--accountkey <key>` for account switching. Pass `--edgerc` and
+`--section` to `scripts/preflight.sh` too, so it checks the same section the
+purge will use.
+
+These three are **global flags**: they go between `purge` and the subcommand,
+never after it. `--staging`, `--cpcode` and `--tag` are **command flags** and
+go after the subcommand:
+
+```bash
+akamai purge [--edgerc <path>] [--section <name>] [--accountkey <key>] \
+  invalidate|delete [--staging] [--cpcode|--tag] <targets>...
+```
 
 ## Running
 
@@ -79,6 +90,8 @@ akamai purge invalidate --staging https://example.com/path
 akamai purge invalidate --cpcode 1234567
 akamai purge invalidate --tag product-detail
 akamai purge delete https://example.com/path
+akamai purge --section <name> invalidate https://example.com/path
+akamai purge --section <name> invalidate --staging https://example.com/path
 ```
 
 More targets than fit comfortably on a line — pipe them instead, the CLI reads
@@ -117,6 +130,9 @@ On failure, show the CLI's error verbatim. Common ones:
 - `403` — the API client lacks CCU READ-WRITE, or the URL's property is not on
   this account (try `--accountkey`).
 - `Unable to find section` — wrong `--section`; the purge default is `ccu`.
+- `Incorrect Usage: flag provided but not defined: -section` (or `-edgerc`,
+  `-accountkey`) — a global flag was put after the subcommand. Move it before
+  `invalidate` / `delete`.
 
 ## Guardrails
 
