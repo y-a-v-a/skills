@@ -179,11 +179,5 @@
       "just do it",
       "I'm in no hurry, take your time and do the refactor properly"
     ]
-  },
-  "google-search": {
-    "should_not_trigger": [
-      "search the web for the latest Node.js release",
-      "find recent news about the Rust programming language"
-    ]
   }
 }

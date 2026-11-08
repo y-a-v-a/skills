@@ -14,10 +14,6 @@ Three skills that bring the [OpenAI Codex CLI](https://developers.openai.com/cod
 
 The repo also includes `codex-validate`, a project-local skill that tests the three skills against a live Codex CLI. It is not linked globally.
 
-### 🔍 [Google Programmable Search Engine](./gpse-skill)
-
-- **`/google-search`** — **Deprecated:** Google discontinues the Custom Search JSON API on 2027-01-01 and no longer accepts new customers. Until then, searches the web with date, site, exact-phrase, and exclusion filters plus pagination, for existing API keys. Plain Node.js, no dependencies. User-invoked only.
-
 ### 🧐 [Stern Code Review](./stern-code-review)
 
 - **`/stern-code-review`** — A blunt, senior-level review focused on correctness, data safety, security, and production risk. Ends in a verdict (`approve` / `approve with fixes` / `request changes` / `reject`), the tests that should exist, and the minimal acceptable fix.
@@ -88,13 +84,12 @@ Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
 ./link-skill.sh --check    # report drift: links pointing elsewhere, real dirs shadowing a repo skill, dangling links
 ```
 
-Each skill is linked under its own name (e.g. `~/.claude/skills/html`), taken from the skill's `name:` frontmatter, so nested skills like `codex` and `google-search` land under the right name. Pass `--force` to replace an existing entry, and set `CLAUDE_SKILLS_DIR` to target a different directory.
+Each skill is linked under its own name (e.g. `~/.claude/skills/html`), taken from the skill's `name:` frontmatter, so nested skills like `codex` (in `codex-agent/skills/codex`) land under the right name. Pass `--force` to replace an existing entry, and set `CLAUDE_SKILLS_DIR` to target a different directory.
 
 ## Testing
 
 - **Routing:** `node evals/run-triggers.js` checks that each skill's description loads it for the prompts it should handle, and not for near misses (cases in [`evals/triggers.json`](./evals/triggers.json)). Each case is a headless `claude -p` run with every tool except Skill disabled, so nothing gets executed. `--skill <name>` runs one skill's cases. A same-named skill in `~/.claude/skills` shadows the repo copy, so run `./link-skill.sh --check` first.
 - **scan-secrets:** `node --test scan-secrets/tests/scan-secrets.test.js`
-- **google-search:** `node --test gpse-skill/tests/search.test.js`
 - **codex skills:** `/codex-validate` from inside `codex-agent/` (hooks, wiring, CLI drift, live smoke tests).
 
 ## Author

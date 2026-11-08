@@ -5,7 +5,7 @@
 # A "skill" is any directory in this repo that directly contains a SKILL.md.
 # The link name is taken from the skill's frontmatter `name:` field (falling
 # back to the directory name), so nested layouts like codex-agent/skills/codex
-# and gpse-skill/skill are linked under their real skill names. Project-local
+# are linked under their real skill names. Project-local
 # skills under a .claude/ directory (e.g. codex-agent's codex-validate) are
 # skipped, since they only work from inside their own project.
 #
