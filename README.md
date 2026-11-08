@@ -44,7 +44,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 📸 [Social Preview](./social-preview)
 
-- **`/social-preview`** — Create a 1280×640 GitHub social preview PNG in the project's own style, screenshot it with headless Chrome, and iterate until you approve. See [explainer.html](./social-preview/explainer.html).
+- **`/social-preview`** — Create a 1280×640 GitHub social preview PNG (under 1 MB): several distinct concepts built around the project's real visual, procedural backgrounds (Metal on macOS, WebGL2 elsewhere), critique at full and half size, and iteration until you approve. Techniques are in [craft.md](./social-preview/craft.md); [explainer.html](./social-preview/explainer.html) covers the first version.
 
 ### 🚀 [Ambitious](./ambitious)
 
