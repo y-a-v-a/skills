@@ -52,7 +52,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 📦 [Scpush](./scpush)
 
-- **`/scpush`** — Minimal stage, commit, and push: stages only files that belong to the current work, commits in the style of the recent log, and reports the hash. The lightweight counterpart of `/gg`.
+- **`/scpush`** — Minimal stage, commit, and push: stages only files that belong to the current work, commits in the style of the recent log, and reports the hash. Runs only when you type `/scpush`; in conversation, "commit and push" goes to `/gg`.
 
 ### 🚢 [gg](./gg)
 

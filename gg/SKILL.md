@@ -17,7 +17,9 @@ One invocation takes the working tree from dirty to pushed.
 - `/gg <message>` — same, but use the given text as the commit subject.
 - `/gg <path> [<path>…]` — restrict staging to those paths.
 
-Arguments that name existing paths are paths; anything else is the message.
+Arguments that name a path are paths: one that exists on disk **or** appears
+in `git status` (a deleted file no longer exists, but `/gg old/file.js` after
+deleting it still means that path). Anything else is the message.
 
 ## Steps
 
@@ -57,7 +59,9 @@ Arguments that name existing paths are paths; anything else is the message.
    MSG
    ```
 
-   - Subject: imperative mood, no trailing period, ≤ 50 characters.
+   - Subject: match the length and mood the log in step 2 shows. Only when
+     the log has no usable pattern (new repo, mixed styles), fall back to
+     imperative mood, no trailing period, about 50 characters.
    - Body only when the *why* is not obvious from the subject.
    - Keep the repository's trailers, including
      `Co-Authored-By: Claude <model> <noreply@anthropic.com>` if the log has it.
