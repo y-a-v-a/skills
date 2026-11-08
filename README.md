@@ -66,7 +66,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 - **`/sendmail`** — Draft an email in Outlook on macOS, e.g. `/sendmail kim@example.com ask Kim for the Q3 numbers`. The text is used as the body verbatim or as an instruction to write one, and the subject is derived from it. Opens the draft for review; never sends.
 
-### 🧹 [Purge](./purge)
+### 🧹 [Flushcache](./flushcache)
 
 - **`/flushcache`** — Purge Akamai edge cache for URLs, CP codes, or cache tags through the [Akamai CLI](https://github.com/akamai/cli). Invalidates on production by default (`--staging`, `--delete` to change that), checks credentials first, and asks before broad purges.
 

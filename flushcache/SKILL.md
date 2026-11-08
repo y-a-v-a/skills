@@ -1,6 +1,11 @@
 ---
 name: flushcache
 description: Purge Akamai edge cache via the Akamai CLI. Invoked as /flushcache with one or more URLs, CP codes, or cache tags — for example "/flushcache https://example.com". Defaults to invalidate on production, supports --staging and --delete, verifies credentials before running, and confirms before any broad purge.
+argument-hint: "<url|cpcode|tag>... [--staging] [--delete] [--cpcode|--tag]"
+# A production purge can't be undone and sends a burst of traffic to origin:
+# it runs only when the user types /flushcache, never on the model's inference
+# that "the cache looks stale".
+disable-model-invocation: true
 license: MIT
 metadata:
   author: Vincent Bruijn
@@ -46,7 +51,9 @@ Reject, with one line and no command run:
 
 ## Preflight
 
-Run `scripts/preflight.sh` before the first purge of a session. It checks the
+Run `<skill-dir>/scripts/preflight.sh` before the first purge of a session,
+where `<skill-dir>` is the directory this SKILL.md is in (not the current
+working directory, which is the user's project). It checks the
 `akamai` binary, the `purge` package, and the credentials file; it prints
 findings only, never credential values.
 
@@ -70,7 +77,7 @@ the conversation, write them to `~/.edgerc` and say they should be rotated.
 Non-default locations are supported by the CLI and should be passed through
 when the user names them: `--edgerc <path>`, `--section <name>` (default
 `ccu`), `--accountkey <key>` for account switching. Pass `--edgerc` and
-`--section` to `scripts/preflight.sh` too, so it checks the same section the
+`--section` to `<skill-dir>/scripts/preflight.sh` too, so it checks the same section the
 purge will use.
 
 These three are **global flags**: they go between `purge` and the subcommand,
