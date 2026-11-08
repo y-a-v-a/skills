@@ -16,7 +16,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 🔍 [Google Programmable Search Engine](./gpse-skill)
 
-- **`/google-search`** — Search the web through Google's Custom Search API, with date, site, exact-phrase, and exclusion filters plus pagination. Plain Node.js, no dependencies. Needs an API key and search engine ID (free tier: 100 queries/day).
+- **`/google-search`** — **Deprecated:** Google discontinues the Custom Search JSON API on 2027-01-01 and no longer accepts new customers. Until then, searches the web with date, site, exact-phrase, and exclusion filters plus pagination, for existing API keys. Plain Node.js, no dependencies. User-invoked only.
 
 ### 🧐 [Stern Code Review](./stern-code-review)
 

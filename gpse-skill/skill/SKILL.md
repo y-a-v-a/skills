@@ -1,18 +1,30 @@
 ---
 name: google-search
-description: Search the web using Google Programmable Search Engine. Use when you need to search for information online with custom search engine configuration.
+description: "Deprecated: Google discontinues the Custom Search JSON API on 2027-01-01 and accepts no new customers. Searches the web through Google Programmable Search Engine with date, site, exact-phrase and exclusion filters. Runs only when invoked as /google-search; for everyday web search use the agent's built-in search."
 license: MIT
 metadata:
   author: Vincent Bruijn
   author-url: https://vincentbruijn.nl
+argument-hint: "<query> [--date=w1] [--site=example.com] [--exact=phrase] [--exclude=terms]"
+# Deprecated, and it would otherwise compete with the built-in WebSearch tool
+# for every "search for…" request: user-invoked only.
+disable-model-invocation: true
 allowed-tools:
   - Bash
-user-invocable: true
 ---
 
 # Google Programmable Search Engine Skill
 
-This skill enables web search using Google's Programmable Search Engine.
+> **Deprecated.** Google closed the Custom Search JSON API to new customers
+> and **discontinues it on 2027-01-01**
+> ([overview](https://developers.google.com/custom-search/v1/overview)).
+> Until then it works for existing API keys. From that date the script exits
+> with a message saying so: report that to the user instead of troubleshooting
+> credentials, and use the built-in web search if one is available.
+
+This skill enables web search using Google's Programmable Search Engine. Its
+remaining edge over a built-in web search is precise filtering: by date
+(`--date`), by site, by exact phrase, and by exclusion.
 
 ## Setup
 
@@ -25,8 +37,11 @@ Requires environment variables:
 Execute searches with:
 
 ```bash
-node scripts/search.js "search query here"
+node <skill-dir>/scripts/search.js "search query here"
 ```
+
+`<skill-dir>` is the directory this SKILL.md is in, not the current working
+directory (that is the user's project, where `scripts/search.js` doesn't exist).
 
 ### Common Options
 
@@ -47,7 +62,8 @@ See [reference.md](reference.md) for full parameter documentation and examples.
 
 ## Missing Credentials Handling
 
-If a search fails due to missing GOOGLE_API_KEY or GOOGLE_CX environment variables:
+If a search fails due to missing GOOGLE_API_KEY or GOOGLE_CX environment variables
+(only for existing API customers: Google no longer issues access to new ones):
 
 1. Use AskUserQuestion to ask the user:
    - "Would you like help setting up the Google Search credentials?"

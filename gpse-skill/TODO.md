@@ -96,3 +96,14 @@
 - [ ] Verify skill discovery and auto-activation
 - [ ] Test user-invocable slash command
 - [ ] Get user feedback and iterate
+
+## Phase 4: Retirement
+
+Google discontinues the Custom Search JSON API on 2027-01-01 and has closed it
+to new customers.
+
+- [x] Mark the skill deprecated and user-invoked only
+- [x] Make search.js report the shutdown instead of a credentials error
+- [ ] Decide: remove the skill after 2027-01-01, or swap in another search
+      backend behind the same `search.js` interface (its filter flags are the
+      skill's remaining value over the built-in web search)

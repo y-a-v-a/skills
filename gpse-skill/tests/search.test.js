@@ -19,7 +19,10 @@ const {
   API_ENDPOINT,
   DEFAULT_FIELDS,
   DEFAULT_NUM_RESULTS,
-  DEFAULT_START_INDEX
+  DEFAULT_START_INDEX,
+  isDiscontinued,
+  SHUTDOWN_DATE,
+  SHUTDOWN_MESSAGE,
 } = require('../skill/scripts/search.js');
 
 describe('sanitizeInput', () => {
@@ -493,5 +496,22 @@ describe('constants', () => {
 
   it('should have correct default start index', () => {
     assert.strictEqual(DEFAULT_START_INDEX, 1);
+  });
+});
+
+describe('isDiscontinued', () => {
+  it('is false before the 2027-01-01 shutdown', () => {
+    assert.strictEqual(isDiscontinued(new Date('2026-12-31T23:59:59Z')), false);
+  });
+
+  it('is true from the shutdown moment on', () => {
+    assert.strictEqual(isDiscontinued(new Date('2027-01-01T00:00:00Z')), true);
+    assert.strictEqual(isDiscontinued(new Date('2027-06-01T12:00:00Z')), true);
+  });
+
+  it('names the date and an alternative in the message', () => {
+    assert.strictEqual(SHUTDOWN_DATE.toISOString().slice(0, 10), '2027-01-01');
+    assert.match(SHUTDOWN_MESSAGE, /2027-01-01/);
+    assert.match(SHUTDOWN_MESSAGE, /built-in web search/);
   });
 });

@@ -22,13 +22,13 @@ To retrieve additional results beyond the first page, use the `--start` paramete
 
 ```bash
 # First page (results 1-10)
-node scripts/search.js "quantum computing"
+node <skill-dir>/scripts/search.js "quantum computing"
 
 # Second page (results 11-20)
-node scripts/search.js "quantum computing" --start=11
+node <skill-dir>/scripts/search.js "quantum computing" --start=11
 
 # Third page (results 21-30)
-node scripts/search.js "quantum computing" --start=21
+node <skill-dir>/scripts/search.js "quantum computing" --start=21
 ```
 
 **Note:** Google Custom Search API allows a maximum of 100 results per query (start index up to 91 with 10 results).
@@ -38,47 +38,47 @@ node scripts/search.js "quantum computing" --start=21
 ### Basic Search
 User: "Search for recent developments in quantum computing"
 ```bash
-node scripts/search.js "recent developments quantum computing 2026"
+node <skill-dir>/scripts/search.js "recent developments quantum computing 2026"
 ```
 
 ### Direct Invocation
 User: "/google-search machine learning papers"
 ```bash
-node scripts/search.js "machine learning papers"
+node <skill-dir>/scripts/search.js "machine learning papers"
 ```
 
 ### Search with Limited Results
 ```bash
-node scripts/search.js "machine learning papers" --num=5
+node <skill-dir>/scripts/search.js "machine learning papers" --num=5
 ```
 
 ### Search Recent Content
 User: "Find news about AI from the last week"
 ```bash
-node scripts/search.js "AI news" --date=w1
+node <skill-dir>/scripts/search.js "AI news" --date=w1
 ```
 
 ### Site-Specific Search
 User: "Search for Python tutorials on Stack Overflow"
 ```bash
-node scripts/search.js "Python tutorial" --site=stackoverflow.com
+node <skill-dir>/scripts/search.js "Python tutorial" --site=stackoverflow.com
 ```
 
 ### Require Exact Phrase
 ```bash
-node scripts/search.js "programming" --exact=best practices
+node <skill-dir>/scripts/search.js "programming" --exact=best practices
 ```
 
 ### Exclude Unwanted Results
 User: "Find JavaScript frameworks but not React"
 ```bash
-node scripts/search.js "JavaScript framework" --exclude=React
+node <skill-dir>/scripts/search.js "JavaScript framework" --exclude=React
 ```
 
 ### Combined Filters
 User: "Find recent machine learning papers on arxiv"
 ```bash
-node scripts/search.js "machine learning" --date=m1 --site=arxiv.org --num=5
+node <skill-dir>/scripts/search.js "machine learning" --date=m1 --site=arxiv.org --num=5
 ```
 
 ## Response Format

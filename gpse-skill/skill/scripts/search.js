@@ -17,6 +17,22 @@ const DEFAULT_FIELDS = 'kind,items(title,link,snippet)';
 const DEFAULT_NUM_RESULTS = 10;
 const DEFAULT_START_INDEX = 1;
 
+// Google closed the Custom Search JSON API to new customers and discontinues
+// it on this date: https://developers.google.com/custom-search/v1/overview
+const SHUTDOWN_DATE = new Date('2027-01-01T00:00:00Z');
+const SHUTDOWN_MESSAGE =
+  'Google discontinued the Custom Search JSON API on 2027-01-01, so this skill no longer works. ' +
+  'Use the agent\'s built-in web search, or replace the backend of scripts/search.js.';
+
+/**
+ * Whether the API has been discontinued at the given moment
+ * @param {Date} [now] - Moment to check (defaults to the current time)
+ * @returns {boolean} True on or after the shutdown date
+ */
+function isDiscontinued(now = new Date()) {
+  return now.getTime() >= SHUTDOWN_DATE.getTime();
+}
+
 /**
  * Sanitizes user input to prevent injection attacks
  * @param {string} input - Raw user input
@@ -217,6 +233,13 @@ async function search() {
     process.exit(1);
   }
 
+  // After the shutdown every request fails; say why instead of letting the
+  // user debug credentials for a service that no longer exists.
+  if (isDiscontinued()) {
+    console.error(`Error: ${SHUTDOWN_MESSAGE}`);
+    process.exit(1);
+  }
+
   // Get credentials from environment
   const apiKey = process.env.GOOGLE_API_KEY;
   const cx = process.env.GOOGLE_CX;
@@ -298,7 +321,10 @@ module.exports = {
   getErrorMessage,
   formatResults,
   search,
+  isDiscontinued,
   // Constants for testing
+  SHUTDOWN_DATE,
+  SHUTDOWN_MESSAGE,
   API_ENDPOINT,
   DEFAULT_FIELDS,
   DEFAULT_NUM_RESULTS,

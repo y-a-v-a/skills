@@ -1,5 +1,12 @@
 # Google Programmable Search Engine Skill
 
+> **Deprecated.** Google closed the Custom Search JSON API to new customers and
+> **discontinues it on 2027-01-01**
+> ([overview](https://developers.google.com/custom-search/v1/overview)). New API
+> keys can't be set up, so the setup steps below only apply to existing
+> customers. From that date `search.js` exits with a message explaining the
+> shutdown. The skill is user-invoked only (`/google-search`).
+
 A Claude Code skill that enables web search using Google's Programmable Search Engine (formerly Custom Search Engine/CSE).
 
 ## Features
