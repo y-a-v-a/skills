@@ -85,6 +85,7 @@ Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
 ```bash
 ./link-skill.sh --all      # link every skill
 ./link-skill.sh html       # link just one skill
+./link-skill.sh --check    # report drift: links pointing elsewhere, real dirs shadowing a repo skill, dangling links
 ```
 
 Each skill is linked under its own name (e.g. `~/.claude/skills/html`), taken from the skill's `name:` frontmatter, so nested skills like `codex` and `google-search` land under the right name. Pass `--force` to replace an existing entry, and set `CLAUDE_SKILLS_DIR` to target a different directory.

@@ -13,6 +13,7 @@
 #   ./link-skill.sh --all          Link every skill in the repo.
 #   ./link-skill.sh <name>         Link only the named skill (e.g. html).
 #   ./link-skill.sh <name> --force Replace an existing entry at the destination.
+#   ./link-skill.sh --check        Report install drift; change nothing.
 #
 # Result: ~/.claude/skills/<name> is a symlink to the skill's directory.
 
@@ -24,12 +25,18 @@ SKILLS_DIR="${CLAUDE_SKILLS_DIR:-${HOME}/.claude/skills}"
 usage() {
   cat <<EOF
 Usage: $(basename "$0") [--all | <skill-name>] [--force]
+       $(basename "$0") --check
 
 Create symlinks in ${SKILLS_DIR} pointing to the skills in this repo.
 
   --all          Link every skill found in the repo.
   <skill-name>   Link only the named skill (e.g. html).
   --force, -f    Replace an existing symlink or file at the destination.
+  --check        Report, for every skill in this repo, whether the installed
+                 entry links here, links elsewhere, is a real directory that
+                 shadows it, or is missing; plus dangling links. Changes
+                 nothing. Exits 1 when a repo skill is shadowed, linked
+                 elsewhere, or a link into this repo is dangling.
   -h, --help     Show this help.
 
 Examples:
@@ -94,12 +101,50 @@ link_one() {
   echo "+ linked $name -> $dir"
 }
 
+# Report install drift without changing anything.
+check_install() {
+  local name dir dest target drift=0
+  printf 'Checking %s against %s\n\n' "$SKILLS_DIR" "$REPO_DIR"
+  while IFS=$'\t' read -r name dir; do
+    dest="$SKILLS_DIR/$name"
+    if [ -L "$dest" ]; then
+      target="$(readlink "$dest")"
+      if [ "$target" = "$dir" ]; then
+        printf '  ok          %s\n' "$name"
+      else
+        printf '  ELSEWHERE   %s -> %s  (fix: %s %s --force)\n' "$name" "$target" "$(basename "$0")" "$name"
+        drift=1
+      fi
+    elif [ -e "$dest" ]; then
+      printf '  SHADOWED    %s is a real directory, not this repo'"'"'s copy  (compare, then: %s %s --force)\n' "$name" "$(basename "$0")" "$name"
+      drift=1
+    else
+      printf '  -           %s not installed\n' "$name"
+    fi
+  done < <(discover_skills)
+
+  # Links into this repo whose target is gone (e.g. after a rename).
+  local entry
+  for entry in "$SKILLS_DIR"/*; do
+    [ -L "$entry" ] || continue
+    target="$(readlink "$entry")"
+    case "$target" in "$REPO_DIR"/*) ;; *) continue ;; esac
+    if [ ! -e "$target" ]; then
+      printf '  DANGLING    %s -> %s  (remove it, then relink)\n' "$(basename "$entry")" "$target"
+      drift=1
+    fi
+  done
+  return "$drift"
+}
+
 FORCE=0
 ALL=0
+CHECK=0
 TARGET=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --all)        ALL=1 ;;
+    --check)      CHECK=1 ;;
     --force|-f)   FORCE=1 ;;
     -h|--help)    usage; exit 0 ;;
     -*)           echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
@@ -111,6 +156,13 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+
+if [ "$CHECK" -eq 1 ]; then
+  if [ "$ALL" -eq 1 ] || [ -n "$TARGET" ] || [ "$FORCE" -eq 1 ]; then
+    echo "--check takes no other arguments." >&2; exit 2
+  fi
+  check_install; exit $?
+fi
 
 if [ "$ALL" -eq 0 ] && [ -z "$TARGET" ]; then
   usage >&2; exit 2
