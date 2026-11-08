@@ -1,6 +1,6 @@
 ---
 name: sendmail
-description: Prepare a draft email in Microsoft Outlook on macOS via osascript. Invoked as /sendmail with an email address followed by either literal body text or an assignment describing what the mail should say; the subject is derived from the body. Opens the draft in Outlook for review — it never sends.
+description: Prepare a draft email in Microsoft Outlook on macOS via osascript, from an email address plus either literal body text or an instruction for what the mail should say; the subject is derived from the body. Opens the draft in Outlook for review — it never sends. Use when the user invokes /sendmail, or asks to draft, write, or prepare an email or mail to someone in Outlook ("mail kim@example.com that…", "draft an email to…").
 license: MIT
 metadata:
   author: Vincent Bruijn
@@ -60,52 +60,41 @@ Derive it — the user does not pass one. Rules:
 - If the user's arguments explicitly name a subject (`subject: X`, or
   `--subject X`), use that verbatim instead.
 
-## Escaping — do this before building the script
+## Build the draft
 
-`content` is HTML, and both `subject` and `content` are AppleScript string
-literals. In that order, per field:
+The AppleScript is fixed: `scripts/draft.applescript`, in the directory this
+SKILL.md is in. You never edit it or splice values into it. The three values
+travel as UTF-8 **files**, so there is no AppleScript string escaping and no
+shell quoting to get wrong, and non-ASCII text (`é`, `—`, a Dutch name) passes
+through as-is.
 
-1. `\` → `\\`
-2. `"` → `\"`
-3. In `content` only: each newline → `<br>`, and a blank line → `<br><br>`.
-   A literal newline inside an AppleScript string is a syntax error.
-4. Non-ASCII characters → HTML entities in `content` (`é` → `&eacute;`,
-   `—` → `&mdash;`). Keep `subject` plain ASCII; transliterate if needed.
-5. In `content` only: escape HTML-significant characters the user typed as
-   text — `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;` — unless the user clearly
-   intended HTML markup.
+1. Make a fresh directory: `D="$(mktemp -d)"`.
+2. Write three files with the **Write tool** (not `echo`, not a heredoc — both
+   put the text through shell quoting):
+   - `$D/subject.txt` — the subject, one line.
+   - `$D/body.html` — the body as HTML. Build it in this order:
+     1. Escape HTML-significant characters the user typed as text: `&` →
+        `&amp;`, `<` → `&lt;`, `>` → `&gt;`. Skip this only when the user
+        clearly wrote HTML markup themselves.
+     2. Then turn each newline into `<br>` (a blank line becomes `<br><br>`).
 
-## Script
+     The order matters: escaping after step 2 would turn your own `<br>` into
+     visible `&lt;br&gt;` text.
+   - `$D/recipients.tsv` — one recipient per line: display name, a tab, the
+     address. Leave the name empty (line starts with a tab) unless the user
+     gave one (`"Kim" <kim@example.com>` → `Kim<TAB>kim@example.com`).
+3. Run it:
 
-Write the AppleScript to a file in the session scratchpad directory (fall back
-to `"$TMPDIR"`) and run it with `osascript`. Do not pipe a heredoc through the
-shell — the shell adds a second layer of quoting to get wrong.
+   ```bash
+   osascript "<skill-dir>/scripts/draft.applescript" "$D/subject.txt" "$D/body.html" "$D/recipients.tsv"
+   ```
 
-```bash
-cat > "$SCRATCH/sendmail.scpt" <<'EOF'
-tell application "Microsoft Outlook"
-  set msg to make new outgoing message with properties {subject:"SUBJECT", content:"BODY_HTML"}
-  tell msg
-    make new recipient at end of to recipients ¬
-      with properties {email address:{name:"ADDRESS", address:"ADDRESS"}}
-  end tell
-  open msg
-  activate
-end tell
-EOF
-osascript "$SCRATCH/sendmail.scpt"
-```
+   `<skill-dir>` is the directory this SKILL.md is in.
 
-- Replace `SUBJECT`, `BODY_HTML`, `ADDRESS` with the escaped values. Set
-  `name` to the address itself unless the user supplied a display name
-  (`"Kim" <kim@example.com>` → `name:"Kim"`).
-- Multiple recipients: repeat the whole `make new recipient ... end` block,
-  one per address, inside the same `tell msg`.
-- Keep `open msg` and `activate`. **Never** emit `send msg` — not even when
-  the arguments say "send it". Preparing a reviewable draft is the whole
-  contract of this skill; if the user wants it sent, they click Send.
-- `¬` is the AppleScript line-continuation character. Keep it, or put the
-  `with properties` clause on one line.
+The script ends with `open msg` and `activate`, and contains no `send`. Never
+add one, not even when the arguments say "send it": preparing a reviewable
+draft is the whole contract of this skill. If the user wants it sent, they
+click Send.
 
 ## After running
 
