@@ -117,8 +117,18 @@ else
 
     # POSITION: flags on codex exec/review command lines inside code fences.
     # Emits "lineno<TAB>sub<TAB>flag" for each flag that follows the subcommand.
+    # STDIN: emits "lineno<TAB>stdin<TAB>exec|review" for a fenced codex command
+    # (joined across \-continuations) with no stdin redirect. With the prompt
+    # as an argument, codex also reads stdin until EOF, so an inherited pipe
+    # that never closes (background job, agent shell) hangs it forever. The
+    # brief goes on stdin (`- < brief.md`), or the command needs `< /dev/null`.
     while IFS=$'\t' read -r ln sub flag; do
       [ -n "$flag" ] || continue
+      if [ "$sub" = stdin ]; then
+        drift=1
+        echo "DRIFT: 'codex $flag' without a stdin redirect hangs when stdin is an open pipe; add '- < brief.md' or '< /dev/null' — $f:$ln"
+        continue
+      fi
       case "$sub" in exec) allowed="$EXEC" ;; review) allowed="$REVIEW" ;; esac
       case "$allowed" in *" $flag "*) ;; *)
         drift=1
@@ -130,14 +140,18 @@ else
       {
         line = $0
         gsub(/\$\([^)]*\)/, "", line)   # $(git ...) etc. are other commands
-        if (match(line, /(^|[^\/[:alnum:]_-])codex[[:space:]]+(exec|review)([[:space:]]|$)/)) {
+        # Only a command position counts: line start, or after | ; &.
+        # (Not "codex exec" inside a quoted string, e.g. a JSON test payload.)
+        if (match(line, /(^|[|;&])[[:space:]]*codex[[:space:]]+(exec|review)([[:space:]]|$)/)) {
           rest = substr(line, RSTART)
           sub(/^[^c]*codex[[:space:]]+/, "", rest)
           cur = (rest ~ /^exec/) ? "exec" : "review"
           sub(/^(exec|review)/, "", rest)
           cont = 1
+          start = NR; cmd = line
         } else if (cont) {
           rest = line
+          cmd = cmd " " line
         } else {
           next
         }
@@ -146,6 +160,13 @@ else
           rest = substr(rest, RSTART + RLENGTH)
         }
         cont = (line ~ /\\[[:space:]]*$/)
+        # Command complete: exec and review both need a real stdin redirect
+        # (" < file"); both block on an open stdin (measured on codex 0.166).
+        # Placeholders like <sha> or <slug> are not redirects.
+        bare = cmd; gsub(/<[A-Za-z0-9_.-]+>/, "", bare)
+        if (!cont && bare !~ /(^|[[:space:]])<[[:space:]]*[^[:space:]<]/) {
+          printf "%d\tstdin\t%s\n", start, cur
+        }
       }
     ' "$f")
   done

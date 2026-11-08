@@ -66,6 +66,11 @@ echo "$SANDBOX"
   trusted directory" and writes nothing — a fake context-drop. `--cd` also keeps
   Codex from ingesting the whole invoking repo.
 - `codex exec` can take several minutes — give shell calls a 10+ min timeout.
+- **Every `codex exec` and `codex review` needs stdin redirected**: the brief on stdin (`- < brief.md`),
+  or `< /dev/null` when the prompt is an argument. With an argument prompt,
+  codex also reads stdin until EOF; an inherited pipe that never closes (a
+  background job, an agent's shell) hangs it forever at 0% CPU. The drift
+  suite's STDIN check enforces this in the guidance.
 
 ## 1. Hooks suite — the safety gate must hold
 
@@ -144,7 +149,7 @@ not scanned: they name deprecated flags in order to test for them.
 ## 2. `codex` smoke test — does the brief reach Codex?
 
 The point is to prove the gathered context drives the output, not just that a
-file appeared. Plant a unique sentinel in the brief's constraints and assert it
+file appeared. The brief goes in on stdin (`-`), exactly as the skills teach. Plant a unique sentinel in the brief's constraints and assert it
 shows up in the result:
 
 ```bash
@@ -157,7 +162,7 @@ A working CSV parser exists in parser.py.
 ## Task
 Create parser.py with that one function; parse a comma-separated line into a list.
 EOF
-codex exec --sandbox workspace-write --skip-git-repo-check --cd "$SANDBOX" --output-last-message "$SANDBOX/out.txt" "$(cat "$SANDBOX/brief.md")"
+codex exec --sandbox workspace-write --skip-git-repo-check --cd "$SANDBOX" --output-last-message "$SANDBOX/out.txt" - < "$SANDBOX/brief.md"
 grep -q "$SENT" "$SANDBOX/parser.py" && echo "PASS: brief reached Codex" || echo "FAIL: sentinel missing — context was dropped"
 ```
 
@@ -210,7 +215,7 @@ For each finding give severity, category, file:line, problem, and a fix.
 $(cat "$SANDBOX/review.diff")
 \`\`\`
 EOF
-codex exec --sandbox read-only --skip-git-repo-check --cd "$SANDBOX" --output-last-message "$SANDBOX/rout.md" "$(cat "$SANDBOX/rbrief.md")"
+codex exec --sandbox read-only --skip-git-repo-check --cd "$SANDBOX" --output-last-message "$SANDBOX/rout.md" - < "$SANDBOX/rbrief.md"
 grep -qiE 'api_key|secret|hardcoded' "$SANDBOX/rout.md" && echo "PASS: diff reached reviewer" || echo "FAIL: hardcoded secret not flagged — diff was dropped"
 ```
 
@@ -227,7 +232,7 @@ artifact rather than the conclusion:
 codex exec --sandbox read-only --skip-git-repo-check --cd "$SANDBOX" --output-last-message "$SANDBOX/turn.md" \
   "You are the challenger in a design discussion. Read nothing; the proposal is: \
    'store config in a single JSON file'. Raise one substantive objection and end \
-   with a line: 'Signal: AGREE | AGREE_WITH_CAVEATS | DISAGREE | NEEDS_INFO'."
+   with a line: 'Signal: AGREE | AGREE_WITH_CAVEATS | DISAGREE | NEEDS_INFO'." < /dev/null
 grep -qE '^Signal:' "$SANDBOX/turn.md" && echo "PASS: challenger emits a Signal" || echo "FAIL: no Signal line — convergence detection will break"
 ```
 
@@ -288,6 +293,30 @@ copies are installed): that is true only here and goes stale silently.
 - Fix applied: <file(s) changed, or "none">
 - Check added/changed: <new or tightened check here, or "none">
 -->
+
+### 2026-11-08 — target: all (live)  result: PASS (after fixing a hang)
+- Suites: hooks PASS, wiring PASS, drift PASS, codex PASS (19s), codex 2b PASS,
+  codex-review PASS (10s), codex-discuss PASS (8s, after the fix). codex-cli 0.166.0.
+- Failure & root cause: §4 hung for 30 min at 0% CPU. With the prompt as an
+  argument, `codex exec` also reads stdin until EOF (to append it as a
+  `<stdin>` block), and a background job's inherited stdin never closes.
+  Measured: an open pipe held 25 s made a 5 s call take 30 s; `codex review`
+  (no prompt) waits too (22 s vs 90 s with a 90 s pipe). The same applies to
+  the skills: codex-discuss's challenger call and codex-review's three
+  `codex review` commands could hang the same way in an agent shell. (The
+  original codex and codex-review briefs via `"$(cat …)"` had it too; the
+  move to `- < brief.md` fixed those.)
+- Fix applied: `< /dev/null` on the argument-prompt `codex exec` in
+  skills/codex-discuss and on the `codex review` lines in skills/codex-review,
+  with the reason inline; §4 here likewise; §2/§3 now pass the brief on
+  stdin, as the skills do.
+- Check added/changed: drift STDIN rule: every fenced `codex exec`/`codex
+  review` command needs a stdin redirect (placeholders like `<sha>` don't
+  count; quoted payloads like the hook tests' JSON aren't commands). It flags
+  all four hang risks in the previous commit. §0 gotchas document it.
+- §2b detail: a fresh subagent given only skills/codex/SKILL.md and the task
+  read CONVENTIONS.md unprompted, put the sentinel name in its brief's
+  Constraints, and Codex used it (`slugify_<n>` in utils.py).
 
 ### 2026-11-08 — target: hooks, wiring, drift  result: PASS (after fixing the skills)
 - Suites: hooks PASS, wiring PASS (new), drift PASS (extended). Live smoke

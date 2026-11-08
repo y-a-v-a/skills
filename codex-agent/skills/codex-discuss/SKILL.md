@@ -127,11 +127,14 @@ fixed `/tmp` names collide with a concurrent discussion. Each round:
       alternative where you have one. End with a line: \
       'Signal: AGREE | AGREE_WITH_CAVEATS | DISAGREE | NEEDS_INFO'. \
       On the first round you MUST raise at least one substantive objection — do not \
-      agree yet. Do not modify any files."
+      agree yet. Do not modify any files." < /dev/null
    ```
 
    `--cd "$(pwd)"` runs Codex in the repo so it can read those files directly;
-   `--skip-git-repo-check` avoids the trusted-directory refusal.
+   `--skip-git-repo-check` avoids the trusted-directory refusal. Keep
+   `< /dev/null`: when the prompt is an argument, `codex exec` also reads stdin
+   until it closes (to append it as a `<stdin>` block), and in an agent's shell
+   stdin is often a pipe that never closes, so the turn hangs forever.
 
    **Round 1 only — point the challenger at the code; don't summarize it for
    it.** Codex runs read-only and starts cold. Write the `## Repo context`

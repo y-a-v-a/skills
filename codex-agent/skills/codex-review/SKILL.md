@@ -44,10 +44,15 @@ that Codex — a *different* model — reviews the change. So this is most usefu
 2. **Run the review.** Use the scope flag the user passed:
 
    ```bash
-   codex review --uncommitted          # working-tree changes
-   codex review --base main            # branch vs base
-   codex review --commit <sha>         # one commit
+   codex review --uncommitted < /dev/null     # working-tree changes
+   codex review --base main < /dev/null       # branch vs base
+   codex review --commit <sha> < /dev/null    # one commit
    ```
+
+   Keep `< /dev/null`: `codex review` reads stdin until it closes, and in an
+   agent's shell stdin is often a pipe that never closes, so the review hangs
+   forever (measured: a 22-second review took exactly as long as the pipe
+   stayed open).
 
    For a `--focus` pass, or to get structured output, run a directed review over
    the diff instead. `codex exec` consumes **one** prompt — a second positional
