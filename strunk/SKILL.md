@@ -1,6 +1,6 @@
 ---
 name: strunk
-description: Rewrite prose to conform to William Strunk Jr.'s *The Elements of Style* (1918). Accepts a file path or inline text as argument; prints the rewritten text silently with no commentary. Applies rules from all chapters — punctuation, composition, form, the Chapter V misused-words list, and spelling — at moderate aggressiveness: tighten, activate, cut, fix word misuse, but preserve meaning, paragraph order, and the author's claims. Code blocks, inline code, URLs, and quoted speech are passed through verbatim.
+description: "Rewrite prose to conform to William Strunk Jr.'s *The Elements of Style* (1918). Accepts a file path or inline text as argument; prints the rewritten text silently with no commentary. Applies rules from all chapters — punctuation, composition, form, the Chapter V misused-words list, and spelling — at moderate aggressiveness: tighten, activate, cut, fix word misuse, but preserve meaning, paragraph order, and the author's claims. Code blocks, inline code, URLs, and quoted speech are passed through verbatim. Use when the user invokes /strunk, or asks to rewrite, tighten, or edit prose by Strunk's rules or The Elements of Style."
 license: MIT
 metadata:
   author: Vincent Bruijn
@@ -39,12 +39,18 @@ Do not:
 Rewrite freely in: ordinary prose, list-item prose, heading prose (but keep slug-able heading anchors stable when context suggests linking).
 
 ## Era caveats
-Strunk wrote in 1918. Three of his rules now read as wrong or dated; apply with judgment, not blindly:
+Strunk wrote in 1918. Some of his rules now read as wrong or dated, and applying them blindly makes modern prose stilted. These override anything below:
 - **Singular *they***: Strunk prescribes *he* with distributives (*each*, *everybody*, *anybody*). Modern English accepts singular *they*. Preserve whichever pronoun the author chose; do not impose *he*.
-- **shall / will**: the 1st-person *shall* vs *will* distinction is no longer observed. Do not introduce *shall* where the author wrote *will*.
+- **shall / will, should / would**: the 1st-person *shall* and conditional *should* distinctions are no longer observed. Never introduce *shall*, and do not change *would* to *should*.
 - **to-day / to-night / to-morrow**: hyphenated forms are obsolete. Write *today*, *tonight*, *tomorrow*.
+- **Split infinitives** are standard English. Move the adverb only when the sentence reads better without the split, never by rule alone.
+- **Plural *data***: in technical writing *data* is usually singular (*the data shows*). Keep the author's choice.
+- **Chapter V vocabulary** (*fix*, *get*, *claim*, *state*, *dependable*, *viewpoint*, *student body*, *people* vs *public*): 1918 usage advice, much of it now plain standard English. Substitute only when the replacement reads naturally to a reader today; *fix a bug* stays *fix a bug*.
 
 Apply every other rule.
+
+## Source text
+`styleguide.txt`, in the directory this SKILL.md is in, is the full 1918 text with Strunk's own examples (about 78 KB, so don't read it whole). When a rule below is unclear for the sentence in front of you, grep it for the rule's heading or the word in question (e.g. `grep -n -A 20 "Omit needless words" styleguide.txt`) and follow his examples.
 
 ---
 
@@ -122,7 +128,7 @@ Apply every other rule.
 - **clever** — restrict to small-scale ingenuity.
 - **compare to** = point out resemblance between different orders; **compare with** = point out differences between same order.
 - **consider** (= *believe to be*) — no *as*. *I consider him competent*, not *as competent*.
-- **data, phenomena, strata** — plural. *These data were tabulated.*
+- **phenomena, strata** — plural. (*data*: see Era caveats.)
 - **dependable** → *reliable*, *trustworthy*.
 - **different than** → *different from* (or *other than*, *unlike*).
 - **divided into** ≠ *composed of*.
@@ -158,18 +164,18 @@ Apply every other rule.
 - **respective, respectively** — usually drop.
 - **shall / will** — see Era caveats above; do not impose 1918 distinction.
 - **so** — avoid as bare intensifier (*so good*, *so warm*).
-- **split infinitive** — avoid (*to diligently inquire* → *to inquire diligently*).
+- **split infinitive** — see Era caveats: unsplit only when it reads better (*to diligently inquire* → *to inquire diligently*).
 - **state** — only *express fully or clearly*; not a substitute for *say*, *remark*.
 - **student body** → *students*.
 - **system** — drop when bare (*the dormitory system* → *dormitories*; *the commission system of government* → *government by commission*).
-- **thanking you in advance** — drop; rewrite as *Will you please…* or *I shall be obliged…*.
+- **thanking you in advance** — drop; rewrite as *Will you please…* (not Strunk's *I shall be obliged*; see Era caveats).
 - **they** — see Era caveats above; do not impose 1918 *he*.
 - **very** — sparingly; prefer a stronger word.
 - **viewpoint** → *point of view*; not a synonym for *view* or *opinion*.
 - **while** — only for *during the time that*. Replace with *and*, *but*, *although*, or a semicolon for the looser senses.
 - **whom / who** — *whom* only when object. *His brother, who he said would send him the money* (not *whom*).
 - **worth while** — only of actions, never before a noun. *His books are not worth reading* (not *not worth while*).
-- **would / should** — 1st-person conditional = *should*. Habitual past: drop *would* and use plain past (*Once a year he visited the old mansion*).
+- **would / should** — keep the author's *would* (see Era caveats). Habitual past: drop *would* and use plain past (*Once a year he visited the old mansion*).
 
 ## Ch. VI — Spelling
 - Modern spelling. Override Strunk on: *today*, *tonight*, *tomorrow* (no hyphen).
