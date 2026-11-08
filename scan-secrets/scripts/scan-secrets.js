@@ -58,14 +58,14 @@ const rules = [
   { id: 'docker-auth', re: /"auth"\s*:\s*"([A-Za-z0-9+/=]{16,})"/g },
   {
     id: 'generic-secret-assignment',
-    re: /\b[\w.-]*(?:password|passwd|pwd|secret|token|api[_-]?key|apikey|access[_-]?key|private[_-]?key|client[_-]?secret|auth)[\w.-]*["']?\s*[:=]\s*(?:"([^"\s]{8,})"|'([^'\s]{8,})'|["']?([^\s"'#,}\]]{8,}))/gi,
+    re: /\b[\w.-]*(?:password|passwd|pwd|secret|token|api[_-]?key|apikey|access[_-]?key|private[_-]?key|client[_-]?secret|auth(?:[_-]?(?:token|key|secret|pass(?:word)?)|orization)?(?![a-z]))[\w.-]*["']?\s*[:=]\s*(?:"([^"\s]{8,})"|'([^'\s]{8,})'|["']?([^\s"'#,}\]]{8,}))/gi,
     heuristic: true,
   },
 ];
 
 const placeholder = /^(\$|\{\{|\$\{|%\(|<|!|\[|\(|lookup|vault_|env\.|secrets\.|var\.|local\.|data\.|module\.|aws_|resolve:|arn:|ssm:|true$|false$|null$|none$|changeme|change_me|example|xxx|your[_-]|dummy|placeholder|redacted|\*+$|required$|optional$|string$|ref$)/i;
 
-const skipExt = new Set(['.png', '.jpg', '.jpeg', '.gif', '.ico', '.webp', '.svg', '.zip', '.gz', '.tgz', '.jar', '.woff', '.woff2', '.ttf', '.eot', '.pdf', '.lock', '.map']);
+const skipExt = new Set(['.png', '.jpg', '.jpeg', '.gif', '.ico', '.webp', '.svg', '.zip', '.gz', '.tgz', '.jar', '.woff', '.woff2', '.ttf', '.eot', '.pdf', '.map']);
 const skipDirs = new Set(['.git', 'node_modules', 'vendor', 'dist', 'build', '.venv', 'venv', '__pycache__', '.terraform', '.next', 'coverage']);
 const maxFileBytes = 5 * 1024 * 1024;
 const maxLineLength = 2000;
@@ -100,6 +100,9 @@ function maskLine(line, values) {
 
 function looksLikeRealSecret(value, quoted) {
   if (placeholder.test(value)) return false;
+  // A URL without user:pass@ is an address, not a credential; URLs that do
+  // carry credentials are caught by the url-with-credentials rule.
+  if (/^[a-z][a-z0-9+.-]*:\/\/[^\s@]+$/i.test(value)) return false;
   if (/^[\w.-]+\.(ya?ml|json|j2|sh|py|txt|pem|key|conf)$/i.test(value)) return false;
   if (/^[\w-]+\/[\w./-]+$/.test(value) && !/[A-Z0-9+=]{20,}/.test(value)) return false;
   if (/^(\/|\\\$|\.\*|\.\/|~)/.test(value)) return false;

@@ -60,7 +60,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 🔐 [Scan Secrets](./scan-secrets)
 
-- **`/scan-secrets`** — Find plaintext secrets (cloud keys, API tokens, passwords, private keys) in a repository. Uses a built-in Node.js scanner, plus [gitleaks](https://github.com/gitleaks/gitleaks) for gitignored files and the full git history when it is installed. Read-only, and every value in the output is masked.
+- **`/scan-secrets`** — Find plaintext secrets (cloud keys, API tokens, passwords, private keys) in a repository. Uses a built-in Node.js scanner, plus [gitleaks](https://github.com/gitleaks/gitleaks) for gitignored files and the full git history when it is installed. Read-only, and every value in the output is masked. Fixture tests: `node --test scan-secrets/tests/scan-secrets.test.js`.
 
 ### ✉️ [Sendmail](./sendmail)
 
