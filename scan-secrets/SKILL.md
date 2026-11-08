@@ -1,6 +1,6 @@
 ---
 name: scan-secrets
-description: Scan a repository or directory for plaintext secrets — cloud keys, API tokens, passwords, private keys — and report them with every value masked. Uses a built-in Node.js scanner and, when installed, gitleaks for the working tree and the full git history. Invoked as /scan-secrets, optionally with a path and flags, for example "/scan-secrets ~/Projects/api --no-history". Read-only; it never changes, commits, or uploads anything.
+description: Scan a repository or directory for plaintext secrets — cloud keys, API tokens, passwords, private keys — and report them with every value masked. Uses a built-in Node.js scanner and, when installed, gitleaks for the working tree and the full git history. Invoked as /scan-secrets, optionally with a path and flags, for example "/scan-secrets ~/Projects/api --no-history". Read-only; it never changes, commits, or uploads anything. Use when the user asks to scan or audit a repo for secrets, leaked credentials, API keys or tokens, or to check before publishing or open-sourcing a repository.
 license: MIT
 metadata:
   author: Vincent Bruijn
