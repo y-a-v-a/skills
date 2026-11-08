@@ -1,6 +1,6 @@
 ---
 name: jfdi
-description: JFDI ("just do it") — work autonomously to a high standard. Make decisions yourself based on verified facts instead of asking, finish the whole job, prove it works, and keep a decision record only for critically important choices. Use when the user invokes /jfdi, says "jfdi", "just do it", "stop asking, just decide", "work autonomously", or makes clear they prefer quality and autonomy over speed and check-ins.
+description: JFDI ("just do it") — work autonomously to a high standard. Make decisions yourself based on verified facts instead of asking, finish the whole job, prove it works, and keep a decision record only for critically important choices. Use only on an explicit request, when the user invokes /jfdi, or says "jfdi", "just do it", "stop asking, just decide", or "work autonomously". Saying they are in no hurry or have budget to spare is not a request to stop checking in.
 license: MIT
 metadata:
   author: Vincent Bruijn
@@ -78,7 +78,7 @@ Record a decision only if at least one of these is true:
 **Where to write it:**
 
 - If the project already has a decisions directory (`docs/adr/`, `docs/decisions/`, `adr/`, `doc/architecture/decisions/`, or similar), follow its format and numbering.
-- Otherwise append to `DECISIONS.md` in the repository root, creating it if needed. Number entries `D-001`, `D-002`, … continuing from the last one.
+- Otherwise append to `DECISIONS.md` in the repository root, creating it if needed. Number entries `D-001`, `D-002`, … continuing from the last one. A new `DECISIONS.md` is an untracked file in someone else's repo: name it in the final report so it isn't committed by accident or lost, and leave tracking it to the user.
 - Outside a repository, put the record in the final report only.
 
 Write the entry when you make the decision, not at the end. Get the date from `date +%F`. Do not commit the record unless the task includes committing.
@@ -100,7 +100,8 @@ Keep it short. Lead with the outcome.
 1. **Done:** what now works, in a sentence or two.
 2. **Verified:** the commands you ran and their results. List anything you could not verify.
 3. **Decisions recorded:** one line each, with the file location — or "none."
-4. **Open items:** questions from hard stops (each with your recommendation) and problems you noticed but did not fix.
+4. **Assumptions:** every assumption you acted on that you could not verify (section 1, step 2), one line each with what would confirm or overturn it — or "none." This is where the user checks your unsupervised judgment.
+5. **Open items:** questions from hard stops (each with your recommendation) and problems you noticed but did not fix.
 
 ## Anti-patterns
 
