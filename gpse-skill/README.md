@@ -140,7 +140,7 @@ Then run `direnv allow`.
 ```bash
 echo $GOOGLE_API_KEY
 echo $GOOGLE_CX
-node scripts/search.js "test query"
+node skill/scripts/search.js "test query"
 ```
 
 ### Security Best Practices
@@ -170,7 +170,7 @@ Search for recent developments in quantum computing
 ### Limiting Results
 
 ```bash
-node scripts/search.js "Python tutorials" --num=5
+node skill/scripts/search.js "Python tutorials" --num=5
 ```
 
 ### Date Filtering
@@ -178,7 +178,7 @@ node scripts/search.js "Python tutorials" --num=5
 Restrict results by time period:
 
 ```bash
-node scripts/search.js "AI news" --date=w1
+node skill/scripts/search.js "AI news" --date=w1
 ```
 
 Date formats: `d[N]` (days), `w[N]` (weeks), `m[N]` (months), `y[N]` (years).
@@ -186,36 +186,36 @@ Date formats: `d[N]` (days), `w[N]` (weeks), `m[N]` (months), `y[N]` (years).
 ### Site-Specific Search
 
 ```bash
-node scripts/search.js "React hooks" --site=github.com
-node scripts/search.js "Python error handling" --site=stackoverflow.com
+node skill/scripts/search.js "React hooks" --site=github.com
+node skill/scripts/search.js "Python error handling" --site=stackoverflow.com
 ```
 
 ### Exact Phrase Matching
 
 ```bash
-node scripts/search.js "machine learning" --exact=best practices
+node skill/scripts/search.js "machine learning" --exact=best practices
 ```
 
 ### Excluding Terms
 
 ```bash
-node scripts/search.js "JavaScript tutorial" --exclude=beginner
+node skill/scripts/search.js "JavaScript tutorial" --exclude=beginner
 ```
 
 ### Combining Filters
 
 ```bash
-node scripts/search.js "Python machine learning" --date=m3 --site=arxiv.org --num=5
+node skill/scripts/search.js "Python machine learning" --date=m3 --site=arxiv.org --num=5
 ```
 
 ### Pagination
 
 ```bash
 # First page (results 1-10)
-node scripts/search.js "quantum computing"
+node skill/scripts/search.js "quantum computing"
 
 # Second page (results 11-20)
-node scripts/search.js "quantum computing" --start=11
+node skill/scripts/search.js "quantum computing" --start=11
 ```
 
 Google Custom Search allows up to 100 results per query (start index up to 91 with 10 results).
@@ -273,7 +273,7 @@ echo "API Key: ${GOOGLE_API_KEY:0:10}..."   # Shows first 10 chars
 echo "CX: $GOOGLE_CX"
 ls -la scripts/search.js
 node --version
-node scripts/search.js "test"
+node skill/scripts/search.js "test"
 ```
 
 ### Error Reference
