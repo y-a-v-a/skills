@@ -90,6 +90,13 @@ Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
 
 Each skill is linked under its own name (e.g. `~/.claude/skills/html`), taken from the skill's `name:` frontmatter, so nested skills like `codex` and `google-search` land under the right name. Pass `--force` to replace an existing entry, and set `CLAUDE_SKILLS_DIR` to target a different directory.
 
+## Testing
+
+- **Routing:** `node evals/run-triggers.js` checks that each skill's description loads it for the prompts it should handle, and not for near misses (cases in [`evals/triggers.json`](./evals/triggers.json)). Each case is a headless `claude -p` run with every tool except Skill disabled, so nothing gets executed. `--skill <name>` runs one skill's cases. A same-named skill in `~/.claude/skills` shadows the repo copy, so run `./link-skill.sh --check` first.
+- **scan-secrets:** `node --test scan-secrets/tests/scan-secrets.test.js`
+- **google-search:** `node --test gpse-skill/tests/search.test.js`
+- **codex skills:** `/codex-validate` from inside `codex-agent/` (hooks, wiring, CLI drift, live smoke tests).
+
 ## Author
 
 Vincent Bruijn · [vebruijn@gmail.com](mailto:vebruijn@gmail.com) · [Buy me a coffee ☕](https://buymeacoffee.com/y4v4)

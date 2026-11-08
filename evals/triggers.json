@@ -1,0 +1,189 @@
+{
+  "_comment": "Routing tests for skill descriptions. should_trigger: the prompt must load this skill. should_not_trigger: it must not (another skill, or none, is fine). Near misses belong in should_not_trigger. Explicit-only skills (disable-model-invocation: true) only have should_not_trigger cases: they guard against that flag being removed. Run: node evals/run-triggers.js",
+  "ambitious": {
+    "should_trigger": [
+      "be more ambitious with this plan: we want to add a CSV export button to the admin page",
+      "think bigger: what's the ambitious version of our quarterly metrics review?",
+      "we're not ambitious enough with this onboarding redesign, aim higher"
+    ],
+    "should_not_trigger": [
+      "add a CSV export button to the admin page",
+      "make this sorting function faster",
+      "what does the word ambitious mean in Dutch?"
+    ]
+  },
+  "attribution": {
+    "should_trigger": [
+      "add author attribution to the README",
+      "put my name in the footer of the website as a copyright credit",
+      "add a copyright line with my name and website to this project"
+    ],
+    "should_not_trigger": [
+      "add an MIT LICENSE file to this repo",
+      "who wrote the lodash library?",
+      "explain what git blame shows for a file"
+    ]
+  },
+  "gg": {
+    "should_trigger": [
+      "commit and push my changes",
+      "stage the relevant files, write a commit message and push it",
+      "ship this: commit and push to the current branch"
+    ],
+    "should_not_trigger": [
+      "how do I undo my last git push?",
+      "open a pull request for this branch",
+      "explain the difference between git merge and git rebase"
+    ]
+  },
+  "grill-me": {
+    "should_trigger": [
+      "grill me on this plan for migrating our database to Postgres",
+      "stress-test my design for the caching layer, ask me the hard questions",
+      "interview me relentlessly about this architecture until we agree"
+    ],
+    "should_not_trigger": [
+      "what's a good recipe for grilled cheese?",
+      "write a plan for migrating our database to Postgres",
+      "review this function for bugs"
+    ]
+  },
+  "guide-me": {
+    "should_trigger": [
+      "walk me through adding an environment variable in the Vercel dashboard",
+      "where do I click to create an access key in the AWS console?",
+      "guide me through adding a CNAME record at my domain registrar"
+    ],
+    "should_not_trigger": [
+      "add DATABASE_URL to my .env.local file",
+      "what is a CNAME record?",
+      "write a GitHub Actions workflow that runs the tests"
+    ]
+  },
+  "html": {
+    "should_trigger": [
+      "export the current situation to an HTML page I can open in my browser",
+      "make a standalone HTML file summarizing what we did and found in this session",
+      "save our findings so far as an HTML report"
+    ],
+    "should_not_trigger": [
+      "write an index.html landing page for my product",
+      "convert docs/guide.md to HTML with pandoc",
+      "fix the CSS on the contact page"
+    ]
+  },
+  "local-url": {
+    "should_trigger": [
+      "give my dev server a nicer URL than localhost:5173 that I can bookmark",
+      "I want to open my app at myapp.localhost instead of 127.0.0.1:3000",
+      "set up a bookmarkable local address for the always-on dashboard on port 8080"
+    ],
+    "should_not_trigger": [
+      "deploy my app to a public URL",
+      "my dev server on localhost:3000 won't start, it says port in use",
+      "expose my local server to the internet with a tunnel"
+    ]
+  },
+  "scan-secrets": {
+    "should_trigger": [
+      "scan this repo for leaked API keys",
+      "check whether any secrets or passwords are committed in this repository before I open-source it",
+      "audit the git history of this project for credentials"
+    ],
+    "should_not_trigger": [
+      "rotate my AWS access key",
+      "how do I store secrets in GitHub Actions?",
+      "add a .env file for the database password"
+    ]
+  },
+  "sendmail": {
+    "should_trigger": [
+      "draft an email in Outlook to kim@example.com asking for the Q3 numbers",
+      "mail jan@example.org that the deploy is done",
+      "prepare an email to bob@example.com summarizing what we just fixed"
+    ],
+    "should_not_trigger": [
+      "write a function that validates email addresses",
+      "set up SMTP sending for my Django app",
+      "what's a polite way to decline a meeting invitation?"
+    ]
+  },
+  "social-preview": {
+    "should_trigger": [
+      "make a social preview image for this repo",
+      "create an open graph image for this GitHub repository",
+      "I need a repo card image for when the GitHub link is shared on Slack"
+    ],
+    "should_not_trigger": [
+      "add og:image meta tags to my Next.js pages",
+      "make a favicon for my site",
+      "resize screenshot.png to 1280x640"
+    ]
+  },
+  "stern-code-review": {
+    "should_trigger": [
+      "give me a blunt, senior-level code review of my changes",
+      "review this diff rigorously, focusing on production risk and failure modes",
+      "do a harsh, no-nonsense correctness review of the payment module"
+    ],
+    "should_not_trigger": [
+      "brainstorm features for my todo app",
+      "implement a login page",
+      "fix the indentation in utils.py"
+    ]
+  },
+  "strunk": {
+    "should_trigger": [
+      "rewrite this paragraph following Strunk's Elements of Style: The reason that he left college was due to the fact that his health became impaired.",
+      "tighten my prose by Strunk's rules: There were a great number of dead leaves lying on the ground.",
+      "apply The Elements of Style to the prose in README.md"
+    ],
+    "should_not_trigger": [
+      "fix the typo on line 3 of README.md",
+      "translate this paragraph into Dutch: The weather is nice today.",
+      "write a short blog post about Rust"
+    ]
+  },
+  "codex": {
+    "should_not_trigger": [
+      "refactor the authentication module to use async/await",
+      "implement this feature with a different model"
+    ]
+  },
+  "codex-review": {
+    "should_not_trigger": [
+      "review my uncommitted changes",
+      "get a second opinion on this diff from another model"
+    ]
+  },
+  "codex-discuss": {
+    "should_not_trigger": [
+      "let's discuss the caching design before writing code",
+      "debate this migration plan with another model"
+    ]
+  },
+  "flushcache": {
+    "should_not_trigger": [
+      "the cache looks stale on https://example.com, can you fix it?",
+      "purge the Akamai cache for https://example.com/products"
+    ]
+  },
+  "scpush": {
+    "should_not_trigger": [
+      "commit and push",
+      "ship it"
+    ]
+  },
+  "jfdi": {
+    "should_not_trigger": [
+      "just do it",
+      "I'm in no hurry, take your time and do the refactor properly"
+    ]
+  },
+  "google-search": {
+    "should_not_trigger": [
+      "search the web for the latest Node.js release",
+      "find recent news about the Rust programming language"
+    ]
+  }
+}
