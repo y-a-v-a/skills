@@ -1,6 +1,10 @@
 ---
 name: jfdi
-description: JFDI ("just do it") — work autonomously to a high standard. Make decisions yourself based on verified facts instead of asking, finish the whole job, prove it works, and keep a decision record only for critically important choices. Use only on an explicit request, when the user invokes /jfdi, or says "jfdi", "just do it", "stop asking, just decide", or "work autonomously". Saying they are in no hurry or have budget to spare is not a request to stop checking in.
+description: JFDI ("just do it") — work autonomously to a high standard. Make decisions yourself based on verified facts instead of asking, finish the whole job, prove it works, and keep a decision record only for critically important choices. Runs only when the user types /jfdi, because it changes how often the agent checks in, so it is never switched on by inference.
+# Explicit-only: a remark like "I'm in no hurry" or "just do it" in passing
+# must not change how the agent asks for permission.
+disable-model-invocation: true
+argument-hint: "[task]"
 license: MIT
 metadata:
   author: Vincent Bruijn

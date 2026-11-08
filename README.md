@@ -72,7 +72,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### ⚡ [JFDI](./jfdi)
 
-- **`/jfdi`** — "Just do it": work autonomously to a high standard. Decides from verified facts instead of asking, finishes and verifies the whole job, and only stops for destructive, outward-facing, or security-related steps. Critical decisions go into an ADR or `DECISIONS.md`.
+- **`/jfdi`** — "Just do it": work autonomously to a high standard. Runs only when you type `/jfdi`. Decides from verified facts instead of asking, finishes and verifies the whole job, and only stops for destructive, outward-facing, or security-related steps. Critical decisions go into an ADR or `DECISIONS.md`.
 
 ### 🔗 [Local URL](./local-url)
 
