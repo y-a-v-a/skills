@@ -12,8 +12,14 @@ hooks:
   PreToolUse:
     - matcher: Bash
       hooks:
+        # Hooks run in the session's cwd, not the skill dir, so a relative path
+        # never resolves. CLAUDE_PLUGIN_ROOT holds the skill dir in skill hooks;
+        # the fallbacks are this project-local skill's own locations. If none
+        # has the script, block codex commands only (fail closed without
+        # locking up Bash). Tested as wired by scripts/check-hook-wiring.sh.
         - type: command
-          command: bash scripts/validate-codex-command.sh
+          command: 'for d in "$CLAUDE_PLUGIN_ROOT" "$CLAUDE_PROJECT_DIR/.claude/skills/codex-validate" "$CLAUDE_PROJECT_DIR/codex-agent/.claude/skills/codex-validate"; do [ -f "$d/scripts/validate-codex-command.sh" ] && exec bash "$d/scripts/validate-codex-command.sh"; done; grep -q codex && { echo "Blocked: codex validation hook script not found; check .claude/skills/codex-validate/scripts." >&2; exit 2; }; exit 0'
+          onFailure: block
 ---
 
 You validate that the sibling Codex skills actually work against a *live* Codex
@@ -27,7 +33,8 @@ what you put in the prompt actually reached Codex, not just that a command exite
 `$ARGUMENTS`
 
 - No target, or `all` → run preflight, hooks, drift, and all three skill smoke tests.
-- `codex` | `codex-review` | `codex-discuss` | `hooks` | `drift` → run just that suite.
+- `codex` | `codex-review` | `codex-discuss` | `hooks` | `drift` → run just that suite
+  (`hooks` includes the §1a wiring check; `codex` includes §2b).
 - `--fix` → when a check fails, apply the fix to the offending skill (not only
   this validator) instead of only reporting it. Without `--fix`, propose the fix
   and ask before editing a sibling skill.
@@ -69,14 +76,41 @@ codex, codex-review, codex-discuss, and this skill's own copy):
 for s in skills/codex skills/codex-review skills/codex-discuss .claude/skills/codex-validate; do
   echo "== $s =="
   echo '{"tool_input":{"command":"codex exec test"}}' | bash "$s/scripts/validate-codex-command.sh"; echo "allow exit=$?"
-  echo '{"tool_input":{"command":"codex exec --dangerously-bypass-approvals-and-sandbox test"}}' | bash "$s/scripts/validate-codex-command.sh"; echo "block exit=$?"
+  for c in "codex exec --dangerously-bypass-approvals-and-sandbox test" \
+           "codex exec -s danger-full-access test" \
+           "codex exec -c sandbox_mode=danger-full-access test" \
+           "codex exec --dangerously-bypass-hook-trust test"; do
+    printf '{"tool_input":{"command":"%s"}}' "$c" | bash "$s/scripts/validate-codex-command.sh" 2>/dev/null; echo "block exit=$? ($c)"
+  done
 done
+md5 -q skills/*/scripts/validate-codex-command.sh .claude/skills/codex-validate/scripts/validate-codex-command.sh | sort -u | wc -l   # must be 1
 ```
 
-**Pass:** the danger flag blocks (exit 2) everywhere; a plain `codex exec`
-is *not* blocked by the script's own rules (in a live session with codex on PATH
-and authenticated, the allow case exits 0). **Fail:** any script lets the danger
-flag through, or the four scripts diverge — they must stay identical.
+**Pass:** every danger spelling blocks (exit 2) everywhere; a plain `codex exec`
+is *not* blocked by the script's own rules (with codex on PATH, the allow case
+exits 0). **Fail:** any script lets a danger flag through, or the four scripts
+diverge — they must stay identical.
+
+### 1a. Wiring — the hook as Claude Code actually runs it
+
+The unit tests above call the script by full path. Claude Code doesn't: it runs
+the frontmatter `command:` string from the **session's cwd**, and a hook that
+can't start (exit 127) is non-blocking, so a bad path fails *open*. That is
+exactly how a relative `bash scripts/…` path shipped and blocked nothing.
+
+```bash
+bash .claude/skills/codex-validate/scripts/check-hook-wiring.sh; echo "exit=$?"
+```
+
+**Pass:** exit 0. For every skill, from a foreign cwd: danger blocked via
+`CLAUDE_PLUGIN_ROOT` and via the fallback install path; with the script
+missing, codex commands are blocked and other commands still pass; the hook
+has `onFailure: block`. **Fail:** any line marked FAIL.
+
+For a live check (recommended after changing the hook command), install a copy
+of a skill as a project skill **under a unique name**: a same-named user-level
+skill in `~/.claude/skills` wins over a project one, so you'd test the wrong copy.
+Have it `echo` a danger command and confirm the session reports a block.
 
 ## 1b. Drift suite — copied guidance must not go stale
 
@@ -88,14 +122,23 @@ newer Codex CLI deprecated). Scan the user-facing guidance surfaces:
 bash .claude/skills/codex-validate/scripts/check-cli-drift.sh; echo "exit=$?"
 ```
 
-**Pass:** exit 0 — no forbidden pattern in any guidance file. **Fail:** exit 1
-with the offending `file:line` → a skill/doc still teaches a deprecated flag.
-With `--fix`, replace it (e.g. `--full-auto` → `--sandbox workspace-write`) and
-re-run to green; otherwise report the drift.
+The script runs three checks:
 
-When a Codex release deprecates or renames a flag, add it to the `FORBIDDEN`
-list in `scripts/check-cli-drift.sh` — that list is the live record of what
-"current" means. The validator's own SKILL.md and `scripts/` are intentionally
+- **FORBIDDEN** — hand-curated patterns known to be wrong (e.g. `--full-auto`).
+- **EXISTS** — every `--flag` the guidance names is accepted by `codex`,
+  `codex exec`, or `codex review`, generated from the installed CLI's `--help`.
+- **POSITION / GLOBAL-ONLY** — flags on a `codex exec`/`codex review` command
+  line must be accepted by that subcommand, and global-only flags (e.g.
+  `--search`) must be placed before the subcommand or labelled global wherever
+  they are mentioned. This caught `codex exec --search`, which the CLI rejects,
+  in three guidance files.
+
+**Pass:** exit 0. **Fail:** exit 1 with the offending `file:line`. With
+`--fix`, correct it and re-run to green; otherwise report the drift. A guidance
+file that has moved also fails: update `FILES` rather than letting it skip.
+
+EXISTS and POSITION track every CLI release on their own. Add to the
+`FORBIDDEN` list only for flags that still parse but are wrong to teach. The validator's own SKILL.md and `scripts/` are intentionally
 not scanned: they name deprecated flags in order to test for them.
 
 ## 2. `codex` smoke test — does the brief reach Codex?
@@ -121,6 +164,33 @@ grep -q "$SENT" "$SANDBOX/parser.py" && echo "PASS: brief reached Codex" || echo
 **Pass:** `parser.py` exists and contains the sentinel name. **Fail (the
 regression we care about):** the file is missing the sentinel → the brief didn't
 reach Codex, i.e. the skill is back to throwing context away. Fix `skills/codex`.
+
+### 2b. Does a model *following the skill* carry the context?
+
+§2 writes the brief itself, so it proves the CLI contract, not the skill: a
+SKILL.md that stopped telling the model to gather context would still pass. This
+test puts the skill's own instructions in front of a model that has never seen
+the task. (`/codex` has `disable-model-invocation: true`, so a subagent can't
+invoke it; it gets the text instead.)
+
+1. Plant the fact in a **file**, not the task, so it can only travel if the
+   model reads the repo and writes it into the brief:
+   ```bash
+   SENT2="slugify_$RANDOM"
+   printf '# Conventions\nEvery public helper in this repo is named exactly: %s\n' "$SENT2" > "$SANDBOX/CONVENTIONS.md"
+   ( cd "$SANDBOX" && git add CONVENTIONS.md && git commit -qm conventions )
+   ```
+2. Spawn a fresh subagent (Agent tool, general-purpose) with: the full text of
+   `skills/codex/SKILL.md`, the task *"Add a helper that turns a title into a
+   URL slug, following this repo's conventions"* with `$ARGUMENTS` replaced by
+   it, and the instruction to follow the skill exactly with `$SANDBOX` as the
+   repo (`--cd "$SANDBOX" --skip-git-repo-check` on every `codex exec`). Do
+   **not** mention CONVENTIONS.md or the sentinel.
+3. Check: `grep -rq "$SENT2" "$SANDBOX" --include='*.py' --include='*.js' --include='*.ts'`.
+
+**Pass:** the new helper carries the sentinel name, so the model gathered
+context, wrote it into the brief, and Codex used it. **Fail:** fix the
+"Gather context" / "Build a brief" steps in `skills/codex`, not this test.
 
 ## 3. `codex-review` smoke test — does the diff reach the reviewer?
 
@@ -205,21 +275,58 @@ expected to get better each time you run it. After reporting:
 Never edit a sibling skill silently — every change you make to one must show up
 as a log entry here describing what broke and what you changed.
 
+The log is committed and read on other machines. Record what you tested and
+found, not the state of this machine (where `~/.claude/skills` points, which
+copies are installed): that is true only here and goes stale silently.
+
 ## Validation log
 
 <!-- Newest first. Template:
 ### <date> — target: <all|codex|...>  result: <PASS|FAIL>
-- Suites: hooks <P/F>, codex <P/F>, codex-review <P/F>, codex-discuss <P/F>
+- Suites: hooks <P/F>, wiring <P/F>, drift <P/F>, codex <P/F>, codex 2b <P/F>, codex-review <P/F>, codex-discuss <P/F>
 - Failure & root cause: <what broke, in which file>
 - Fix applied: <file(s) changed, or "none">
 - Check added/changed: <new or tightened check here, or "none">
 -->
 
+### 2026-11-08 — target: hooks, wiring, drift  result: PASS (after fixing the skills)
+- Suites: hooks PASS, wiring PASS (new), drift PASS (extended). Live smoke
+  tests (§2–§4, §2b) not run in this pass.
+- Failure & root cause:
+  1. **Hook never ran outside the skill dir.** All four frontmatters used
+     `command: bash scripts/validate-codex-command.sh`. Hooks run in the
+     session cwd, so from any user project bash exited 127, which Claude Code
+     treats as non-blocking: `codex exec -s danger-full-access` went through.
+     Confirmed in a live `claude -p` session. §1 called the script by full
+     path, so it could not see this.
+  2. **jq checked before the codex filter.** Skill hooks stay registered for
+     the whole session, so without jq every Bash command was blocked.
+  3. **Bypass spellings not caught:** `-s danger-full-access`,
+     `-c sandbox_mode=danger-full-access`, `--dangerously-bypass-hook-trust`.
+     The "Warning:" lines on exit 0 were never shown to Claude.
+  4. **`codex exec --search` is rejected by codex 0.166** (`--search` is a
+     global flag). Taught in skills/codex, skills/codex-discuss and
+     docs/reference.md. The drift suite missed it: it only knew `--full-auto`.
+- Fix applied: validate-codex-command.sh (all four copies, still identical);
+  hook command in all four frontmatters (`$CLAUDE_PLUGIN_ROOT`, then the
+  install path, fail closed for codex commands only, `onFailure: block`);
+  `--search` guidance in the three files; briefs now go to `codex exec` on
+  stdin (`-`) from a `mktemp -d` dir instead of `"$(cat /tmp/…)"`;
+  codex-review's reconcile step now gets a self-contained brief.
+- Check added/changed: §1 covers every danger spelling; new §1a
+  `check-hook-wiring.sh` runs the frontmatter command from a foreign cwd (fails
+  on the old hooks with 127 in all six scenarios); §1b drift now generates its
+  EXISTS / POSITION / GLOBAL-ONLY checks from `--help` (catches the `--search`
+  mistakes in the old files) and fails on a missing guidance file; new §2b
+  tests the skill's instructions, not just the CLI.
+
 ### 2026-11-07 — target: all  result: PASS
 - Suites: hooks PASS, drift PASS, codex PASS, codex-review PASS, codex-discuss PASS.
 - Context: first run after merging this repo into the `skills` repo as the
-  `codex-agent/` subtree; `~/.claude/skills/codex*` now link here. Hooks were
-  tested through those installed links (all four md5-identical). codex-cli
+  `codex-agent/` subtree. Hooks were unit-tested by full script path (all four
+  md5-identical). (Correction, 2026-11-08: this entry also said
+  `~/.claude/skills/codex*` "now link here". That was true on one machine only;
+  see the note above the log.) codex-cli
   0.163.0 (last validated on 0.141.0): no flag changes broke the checks.
 - Timings: codex 43s, codex-review 13s, codex-discuss 9s (run in parallel).
 - Failure & root cause: none in the skills. §3 as written used GNU `sed -i`,

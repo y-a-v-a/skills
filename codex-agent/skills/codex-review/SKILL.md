@@ -7,13 +7,18 @@ metadata:
   author-url: https://vincentbruijn.nl
 argument-hint: '[--uncommitted | --base <branch> | --commit <sha>] [--focus security|performance|correctness|tests] [--intent "<what the change should do>"]'
 disable-model-invocation: true
-allowed-tools: Bash(codex *), Bash(git diff:*), Bash(git log:*), Read, Write, Edit, Glob, Grep
+allowed-tools: Bash(codex *), Bash(git diff:*), Bash(git log:*), Bash(mktemp *), Read, Write, Edit, Glob, Grep
 hooks:
   PreToolUse:
     - matcher: Bash
       hooks:
+        # Hooks run in the session's cwd, not the skill dir, so a relative path
+        # never resolves. CLAUDE_PLUGIN_ROOT holds the skill dir in skill hooks;
+        # the second path is the standard install location. If neither has the
+        # script, block codex commands only (fail closed without locking up Bash).
         - type: command
-          command: bash scripts/validate-codex-command.sh
+          command: 'for d in "$CLAUDE_PLUGIN_ROOT" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/codex-review"; do [ -f "$d/scripts/validate-codex-command.sh" ] && exec bash "$d/scripts/validate-codex-command.sh"; done; grep -q codex && { echo "Blocked: codex validation hook script not found; reinstall the codex-review skill." >&2; exit 2; }; exit 0'
+          onFailure: block
 ---
 
 You run a code review with OpenAI Codex and then **act as the author's critical
@@ -46,12 +51,15 @@ that Codex — a *different* model — reviews the change. So this is most usefu
 
    For a `--focus` pass, or to get structured output, run a directed review over
    the diff instead. `codex exec` consumes **one** prompt — a second positional
-   arg (`"$(cat /tmp/review.diff)"`) is not reliably read, so the model can end
+   arg (`"$(cat review.diff)"`) is not reliably read, so the model can end
    up reviewing with no diff in front of it. Build a single brief that embeds the
-   intent *and* the diff, then pass that one file:
+   intent *and* the diff, then pass that one file **on stdin** (`-`). Don't
+   inline it with `"$(cat …)"`: Linux caps a single argument at 128 KB, which a
+   branch diff easily passes.
 
    ```bash
-   git diff <scope> > /tmp/review.diff
+   D="$(mktemp -d)"     # fresh per run; fixed /tmp names collide between sessions
+   git diff <scope> > "$D/review.diff"
    {
      echo "## Intent"
      echo "<intent — what this change should do>"
@@ -66,11 +74,10 @@ that Codex — a *different* model — reviews the change. So this is most usefu
      echo
      echo "## Diff"
      echo '```diff'
-     cat /tmp/review.diff
+     cat "$D/review.diff"
      echo '```'
-   } > /tmp/codex-review-brief.md
-   codex exec --sandbox read-only --output-last-message /tmp/codex-review.md \
-     "$(cat /tmp/codex-review-brief.md)"
+   } > "$D/brief.md"
+   codex exec --sandbox read-only --output-last-message "$D/review.md" - < "$D/brief.md"
    ```
 
 3. **Triage every finding.** Don't accept findings on the reviewer's authority —
@@ -85,13 +92,37 @@ that Codex — a *different* model — reviews the change. So this is most usefu
 
 4. **Reconcile what's contested.** For every `Discuss` item (and any `Reject` on a
    Blocker/Major), put your rebuttal back to Codex for one round so the two models
-   actually settle it rather than you silently overruling:
+   actually settle it rather than you silently overruling.
+
+   This call is a **fresh, stateless** Codex: it has not seen the review, the
+   diff, or the finding. A one-line "You flagged X" makes it judge a claim with
+   no code in front of it. Give it a self-contained brief and run it in the repo
+   so it can open the file itself. Write this to `$D/reconcile.md` with the
+   Write tool:
+
+   ```markdown
+   ## Change under review
+   <intent, one line>
+
+   ## The finding
+   <severity · category> <file>:<line> — <the finding as Codex stated it>
+
+   ## The code
+   <the diff hunk for that location, plus surrounding lines if they matter>
+
+   ## Rebuttal
+   <your position and the evidence for it>
+
+   ## Question
+   Open <file> yourself and check. Is the issue real as stated? Reply HOLD (with
+   the concrete failing input or sequence) or WITHDRAW (with why). One paragraph.
+   ```
+
+   Then:
 
    ```bash
-   codex exec --sandbox read-only --output-last-message /tmp/codex-reply.md \
-     "You flagged: <finding>. My position: <your rebuttal>. Is the issue real as \
-      stated? Reply: HOLD (with the concrete failing case) or WITHDRAW (with why). \
-      One paragraph."
+   codex exec --sandbox read-only --cd "$(git rev-parse --show-toplevel)" \
+     --output-last-message "$D/reply.md" - < "$D/reconcile.md"
    ```
 
    Record the resolution. A Blocker that survives reconciliation stays a Blocker.
@@ -111,6 +142,10 @@ that Codex — a *different* model — reviews the change. So this is most usefu
    ## Reconciled
    - <finding> — Codex HELD/WITHDREW: <one line>
    ```
+
+   The report lands inside the user's repo. If `codex-reviews/` is neither
+   tracked nor gitignored there, say so in the report-back and offer once to
+   add it to `.gitignore`, so it isn't swept into the next commit by accident.
 
    Apply accepted fixes only if the user asked for changes; otherwise hand back
    the triaged findings and the report path.

@@ -52,6 +52,13 @@ echo '{"tool_input":{"command":"codex exec --dangerously-bypass-approvals-and-sa
 
 Set `CODEX_ALLOW_DANGER_MODE=1` or `CODEX_ALLOW_BYPASS=1` to permit dangerous operations.
 
+The lines above test the script. To test the hook **as wired** (the frontmatter
+command, run from a foreign cwd the way Claude Code runs it):
+
+```bash
+bash .claude/skills/codex-validate/scripts/check-hook-wiring.sh
+```
+
 ## Troubleshooting
 
 See [reference.md](./reference.md#troubleshooting).

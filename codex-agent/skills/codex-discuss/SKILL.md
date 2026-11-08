@@ -7,13 +7,18 @@ metadata:
   author-url: https://vincentbruijn.nl
 argument-hint: "[topic or question to work through]"
 disable-model-invocation: true
-allowed-tools: Bash(codex *), Read, Write, Edit, Glob, Grep
+allowed-tools: Bash(codex *), Bash(mktemp *), Read, Write, Edit, Glob, Grep
 hooks:
   PreToolUse:
     - matcher: Bash
       hooks:
+        # Hooks run in the session's cwd, not the skill dir, so a relative path
+        # never resolves. CLAUDE_PLUGIN_ROOT holds the skill dir in skill hooks;
+        # the second path is the standard install location. If neither has the
+        # script, block codex commands only (fail closed without locking up Bash).
         - type: command
-          command: bash scripts/validate-codex-command.sh
+          command: 'for d in "$CLAUDE_PLUGIN_ROOT" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/codex-discuss"; do [ -f "$d/scripts/validate-codex-command.sh" ] && exec bash "$d/scripts/validate-codex-command.sh"; done; grep -q codex && { echo "Blocked: codex validation hook script not found; reinstall the codex-discuss skill." >&2; exit 2; }; exit 0'
+          onFailure: block
 ---
 
 You drive a structured, turn-based discussion with OpenAI Codex to converge on a
@@ -99,14 +104,20 @@ Template:
 
 ## The loop (autonomous)
 
-Run to a conclusion without pausing for the user. Each round:
+Run to a conclusion without pausing for the user. Each Codex turn takes
+minutes, so after every round print **one line** to the user, for example
+`Round 2/5: Codex DISAGREE · open O3, O4 · revising the cache-key proposal`.
+A silent multi-minute loop looks the same as a hung one.
+
+Create a fresh scratch directory once, before round 1 (`D="$(mktemp -d)"`);
+fixed `/tmp` names collide with a concurrent discussion. Each round:
 
 1. **Codex's turn.** Capture it to a temp file, then append it verbatim under a
    `## Turn N — Codex (challenger)` heading:
 
    ```bash
    codex exec --sandbox read-only --skip-git-repo-check --cd "$(pwd)" \
-     --output-last-message /tmp/codex-turn.md \
+     --output-last-message "$D/turn-N.md" \
      "You are the challenger in a design discussion. Read the discussion file at \
       codex-discussions/<slug>.md — start from its '## Live state' and any OPEN \
       '## Objections' — AND open the actual repo files it lists under \
@@ -179,8 +190,9 @@ When the loop ends, fill in an `## Outcome` section:
 ## Variations
 - **Codex proposes.** When you want Codex's design instead, write the goal and
   ask Codex for Turn 1; you take the challenger role. Same loop, roles swapped.
-- **Deeper context.** Add `--search` to let Codex consult external sources, or
-  `--model <model>` to pick the reviewer model.
+- **Deeper context.** Add the global flag `--search` before `exec`
+  (`codex --search exec …`; `codex exec` rejects it) to let Codex consult
+  external sources, or add `--model <model>` to pick the reviewer model.
 
 ## Reporting
 After the loop, tell the user: the **result** (converged or impasse), the

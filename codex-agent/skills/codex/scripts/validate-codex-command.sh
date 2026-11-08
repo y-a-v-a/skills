@@ -1,73 +1,65 @@
 #!/bin/bash
-# Validation hook for Codex CLI commands
-# This script validates Codex commands before execution to ensure safety
+# Validation hook for Codex CLI commands (PreToolUse, matcher: Bash).
+#
+# Skill hooks stay registered for the rest of the session once the skill is
+# invoked, so this runs before EVERY Bash call. Non-codex commands must pass
+# through fast and must never be blocked by this script's own dependencies.
 #
 # Exit codes:
-#   0 - Allow operation
-#   2 - Block operation (stderr message returned to Claude)
-#   Other - Undefined behavior
+#   0 - allow
+#   2 - block (stderr is returned to Claude as the reason)
+# Claude never sees stderr from a hook that exits 0, so this script prints
+# nothing on the allow path: a "warning" there would go nowhere.
 
-# Check for jq dependency
-if ! command -v jq &> /dev/null; then
-  echo "Error: jq is required for command validation but not found in PATH" >&2
-  echo "Install jq: https://stedolan.github.io/jq/download/" >&2
-  exit 2
-fi
-
-# Read input JSON from stdin
 INPUT=$(cat)
 
-# Extract the bash command from the JSON
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-
-# Check if this is a Codex command by looking for "codex" as a word boundary
-# This catches: codex, /path/to/codex, ./codex, ENV=val codex, etc.
-if ! echo "$COMMAND" | grep -qE '\bcodex\b'; then
-  # Not a Codex command, allow it
+# 1. Cheap pre-filter on the raw JSON: no "codex" anywhere means not ours.
+#    Done before the jq check so a missing jq can't block unrelated commands.
+if ! grep -qE '\bcodex\b' <<<"$INPUT"; then
   exit 0
 fi
 
-# Validation rules for Codex commands
-
-# 1. Block danger-full-access unless explicitly in a safe environment
-if echo "$COMMAND" | grep -q -- "--sandbox.*danger-full-access"; then
-  if [ -z "$CODEX_ALLOW_DANGER_MODE" ]; then
-    echo "Blocked: danger-full-access requires CODEX_ALLOW_DANGER_MODE environment variable" >&2
-    echo "This safety check prevents unrestricted filesystem access." >&2
-    echo "If you're in a safe environment, set: export CODEX_ALLOW_DANGER_MODE=1" >&2
-    exit 2
-  fi
-fi
-
-# 2. Warn about missing output capture for long tasks
-if echo "$COMMAND" | grep -q "codex exec" && ! echo "$COMMAND" | grep -q -- "--output-last-message"; then
-  # This is a warning, not a block - but we'll note it in stderr and still allow
-  echo "Warning: Consider using --output-last-message to capture results" >&2
-fi
-
-# 3. Block commands that try to bypass approvals without proper safeguards
-if echo "$COMMAND" | grep -q -- "--dangerously-bypass-approvals-and-sandbox"; then
-  if [ -z "$CODEX_ALLOW_BYPASS" ]; then
-    echo "Blocked: --dangerously-bypass-approvals-and-sandbox requires CODEX_ALLOW_BYPASS=1" >&2
-    echo "This flag disables all safety checks. Only use in isolated CI/CD environments." >&2
-    exit 2
-  fi
-fi
-
-# 4. Ensure Codex is installed
-if ! command -v codex &> /dev/null; then
-  echo "Blocked: 'codex' command not found in PATH" >&2
-  echo "Please install the Codex CLI: https://developers.openai.com/codex/cli" >&2
+# 2. From here on this may be a codex command, so fail closed.
+if ! command -v jq >/dev/null 2>&1; then
+  echo "Blocked: jq is required to validate codex commands but is not on PATH." >&2
+  echo "Install jq (brew install jq) and retry." >&2
   exit 2
 fi
 
-# 5. Check authentication status for non-help commands
-if echo "$COMMAND" | grep -qv "codex login\|codex --help\|codex -h"; then
-  if ! codex login status &> /dev/null; then
-    echo "Warning: Codex CLI may not be authenticated. Run 'codex login' if needed." >&2
-    # Don't block, just warn
+COMMAND=$(jq -r '.tool_input.command // empty' <<<"$INPUT")
+
+# Only the command itself counts, not other fields of the tool input.
+if ! grep -qE '\bcodex\b' <<<"$COMMAND"; then
+  exit 0
+fi
+
+# 3. Unrestricted filesystem access, in every spelling the CLI accepts:
+#    --sandbox danger-full-access, --sandbox=..., -s danger-full-access,
+#    -c sandbox_mode="danger-full-access".
+if grep -qE -- "(--sandbox|-s)(=|[[:space:]]+)[\"']?danger-full-access|sandbox_mode[[:space:]]*=[[:space:]]*[\"']*danger-full-access" <<<"$COMMAND"; then
+  if [ -z "$CODEX_ALLOW_DANGER_MODE" ]; then
+    echo "Blocked: danger-full-access requires the CODEX_ALLOW_DANGER_MODE environment variable." >&2
+    echo "This safety check prevents unrestricted filesystem access." >&2
+    echo "If you are in a safe environment, set: export CODEX_ALLOW_DANGER_MODE=1" >&2
+    exit 2
   fi
 fi
 
-# All checks passed
+# 4. Flags that switch off approvals, the sandbox, or hook trust.
+#    --yolo is an alias of the first flag in some CLI versions.
+if grep -qE -- "--dangerously-bypass-approvals-and-sandbox|--dangerously-bypass-hook-trust|--yolo\b" <<<"$COMMAND"; then
+  if [ -z "$CODEX_ALLOW_BYPASS" ]; then
+    echo "Blocked: this codex flag disables approvals, sandboxing, or hook trust and requires CODEX_ALLOW_BYPASS=1." >&2
+    echo "Only use it in isolated, externally sandboxed CI environments." >&2
+    exit 2
+  fi
+fi
+
+# 5. Codex must be installed.
+if ! command -v codex >/dev/null 2>&1; then
+  echo "Blocked: 'codex' command not found in PATH." >&2
+  echo "Install the Codex CLI: https://developers.openai.com/codex/cli" >&2
+  exit 2
+fi
+
 exit 0

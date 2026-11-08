@@ -68,7 +68,7 @@ codex --version
 | `--model <model>` | Override model selection |
 | `--sandbox <policy>` | Set permissions (read-only, workspace-write, danger-full-access) |
 | `--cd <dir>` | Set working directory |
-| `--search` | Enable web search |
+| `--search` | Enable web search. **Global flag:** goes before `exec` (`codex --search exec …`); `codex exec --search` is rejected |
 
 ## Environment Variables
 
@@ -99,8 +99,9 @@ Add project rules to the Markdown body of `skills/codex/SKILL.md`:
 | `codex: command not found` | Install Codex CLI and add to PATH |
 | Skill not appearing | Check symlink: `ls -la ~/.claude/skills/codex` |
 | Authentication errors | Run `codex login` |
-| Validation blocks everything | `chmod +x skills/codex/scripts/validate-codex-command.sh` |
-| Hooks not working | Verify script path is relative to skill directory |
+| Codex commands blocked: "jq is required" | Install jq (`brew install jq`); the hook needs it to inspect codex commands |
+| Codex commands blocked: "hook script not found" | Reinstall the skill (`./link-skill.sh <name> --force`); the hook looks in `$CLAUDE_PLUGIN_ROOT` and `~/.claude/skills/<name>` |
+| Hooks not working | Hooks run in the session's cwd, not the skill dir, so a relative script path never resolves (and a hook that can't start does not block). Run `bash .claude/skills/codex-validate/scripts/check-hook-wiring.sh` |
 
 ## Resources
 
