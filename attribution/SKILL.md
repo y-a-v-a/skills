@@ -18,7 +18,9 @@ Arguments provided: $ARGUMENTS
 Parse the arguments as follows:
 
 - **No arguments**: use the local git configuration for identity. Run
-  `git config user.name` to get the author's name. Do NOT include the email
+  `git config user.name` to get the author's name. If that prints nothing
+  (no repository, or no name configured), ask the user for the name; never
+  guess one from the OS account or a commit author. Do NOT include the email
   address from `git config user.email` — emails in public files attract spam
   scrapers and must only appear when the user explicitly provides one.
 - **Identity arguments**: arguments may contain any combination of a name
@@ -50,14 +52,22 @@ Parse the arguments as follows:
 
 ## Format
 
-Default to a copyright-style credit including the current year:
+Default to a copyright-style credit. The shapes below use placeholders: fill
+in only what you have, and drop the parts you don't (no website given means
+no ` · <domain>` part at all).
 
-- Markdown: `© 2026 Vincent Bruijn · [vincentbruijn.nl](https://www.vincentbruijn.nl)`
-- HTML: `<p>&copy; 2026 Vincent Bruijn &middot; <a href="https://www.vincentbruijn.nl">vincentbruijn.nl</a></p>`
+- Markdown: `© <YEAR> <NAME> · [<domain>](<website URL>)`
+- HTML: `<p>&copy; <YEAR> <NAME> &middot; <a href="<website URL>"><domain></a></p>`
 
 Rules:
 
-- Use the actual current year, not a hardcoded one.
+- **Year:** the current year for a new project. For an existing one, a range
+  from the first commit's year (`git log --reverse --format=%ad --date=format:%Y | head -1`)
+  to now, e.g. `2023–2026`; a single year when they are the same.
+- **Match the LICENSE.** If the project has a `LICENSE` (or `LICENSE.md`,
+  `COPYING`) with a copyright line, the credit must name the same holder. If
+  it names someone else (an employer, a previous owner), don't silently add a
+  conflicting `©`: point out the mismatch and ask which is right.
 - Include only the identity fields that are available: name always; website
   and email only when provided. Link emails with `mailto:` in HTML, render
   the website as a link with the bare domain as link text.

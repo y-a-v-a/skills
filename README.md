@@ -28,7 +28,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 🖼️ [HTML Export](./html)
 
-- **`/html`** — Export the current state of the session (work done, findings, data) to a self-contained `index.html`. The agent picks what is worth showing, and it never overwrites a file (`index1.html`, `index2.html`, …).
+- **`/html`** — Export the current state of the session (work done, findings, data) to a self-contained HTML file named after its content and date (`<topic>-<date>.html`). The agent picks what is worth showing, keeps secrets out of the page, writes outside served web directories, and never overwrites a file.
 
 ### 🔥 [Grill Me](./grill-me)
 
