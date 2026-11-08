@@ -14,11 +14,14 @@ Based on Felix Rieseberg's [How to be more ambitious: A tutorial for humans with
 
 Most requests ask for the small version of what the user actually wants, and models deliver exactly that. This skill breaks the loop in both directions: challenge the user's framing, and refuse to let yourself default to the literal, safe, self-graded answer.
 
+Ambition comes in four types. **Speed** (the same work in less time) is the default; skip it. Work the other three: **Altitude**, **Depth**, and **Range**.
+
 ## Input
 - The argument is the task, prompt, or plan to make more ambitious: $ARGUMENTS. If it is a path to an existing file, read it.
 - No argument → use the task under discussion in this conversation. Nothing in progress → ask once what they are working on.
 
-Ambition comes in four types. **Speed** (the same work in less time) is the default; skip it. Work the other three: **Altitude**, **Depth**, and **Range**.
+## First: is this a small task?
+Decide this before anything else. Even a small task usually has a rung above it: fix this typo → spell-check prose in CI; fix this crash → keep the app crash-free. When the task is genuinely small, skip everything below: name the rung above in one line and ask whether to take it or just do the small version. Manufactured ambition is noise.
 
 ## 1. Name the small version
 In one or two sentences, state what was literally asked and what you would have produced by default. Be honest. This is the baseline everything below must beat.
@@ -54,11 +57,11 @@ Then add three more:
 Do not role-play. "Write like a short seller" changes the prose; "do what a short seller does to research a position" changes the result. When the crew is large and subagents are available, give each member its own brief and run them in parallel.
 
 ## 5. Challenge the user
-Belief in what's possible limits people more than ability does; psychology calls this self-efficacy. Find where the user's framing caps the outcome and ask 1–3 pointed questions about it. Ask; don't lecture. Common caps:
-- **Narrow identity.** "I'm a backend dev, not a designer." Michelangelo was a sculptor, not a painter, and he still painted the Sistine Chapel. Ask what they would try if the discipline were not a barrier.
-- **Assumed impossibility.** George Dantzig solved two open statistics problems because he thought they were homework. Ask what would have to be true for this to be possible.
-- **No precedent.** Bannister's four-minute mile stood alone for 46 days before someone matched it. Find an existence proof: someone who did a comparable thing. Search for one if you can.
-- **Fear of failure.** Frame the ambitious rung as a bounded experiment with the small version as the fallback. Linux was announced as "just a hobby, won't be big and professional".
+Belief in what's possible limits people more than ability does (self-efficacy). Find where the user's framing caps the outcome and ask 1–3 pointed questions about it. Ask; don't lecture, and don't tell inspirational stories. Common caps, and the question each one gets:
+- **Narrow identity** ("I'm a backend dev, not a designer"): what would you try if the discipline were not a barrier?
+- **Assumed impossibility:** what would have to be true for this to be possible?
+- **No precedent:** find an existence proof, someone who did a comparable thing. Search for one if you can, and name it.
+- **Fear of failure:** frame the ambitious rung as a bounded experiment with the small version as the fallback.
 
 ## 6. Challenge yourself
 Before presenting anything, audit your answer for the ways models undershoot, and fix every hit:
@@ -84,9 +87,7 @@ End by asking which level to go for: the small version, rung 1, 2, or 3, or the 
 
 ## Executing
 Once the user picks a level, work at that level:
-- **Hold the bar.** Use the instruments and the judge you named. When a target looks out of reach, treat it as reasonable and keep going. If you must concede, report what you hit, the number you reached, and what would close the gap. Never fall back to the small version without saying so.
+- **Hold the bar.** Use the instruments and the judge you named. When a target looks out of reach, treat it as reasonable and keep going: try a genuinely different approach, not the same one harder.
+- **Know when to stop.** After three genuinely different approaches miss the target, stop and report: what you tried, the number you reached, and what would close the gap. Persistence past that point is a loop, not ambition. Never fall back to the small version without saying so.
 - **Get real access.** Ambition needs a computer that can install software and reach the data. If access is missing, ask for it; don't simulate it.
 - **Ambition is not license.** Still confirm before destructive, irreversible, or outward-facing actions: deleting, publishing, sending, spending money.
-
-## Small tasks
-Even a small task usually has a rung above it: fix this typo → spell-check prose in CI; fix this crash → keep the app crash-free. When the task is genuinely small, skip the full brief: name the rung above in one line and ask whether to take it or just do the small version. Manufactured ambition is noise.
