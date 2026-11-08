@@ -32,7 +32,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 🔥 [Grill Me](./grill-me)
 
-- **`/grill-me`** — Get interviewed about a plan or design, one question at a time, each with a recommended answer, until you reach shared understanding. Questions the codebase can answer get answered from the codebase.
+- **`/grill-me`** — Get interviewed about a plan or design until you reach shared understanding. Asks every question that can be answered now in one numbered round, each with a recommended answer that "yes" accepts; facts it can look up, it looks up. Ends with a decision list. Adapted from [Matt Pocock's](https://github.com/mattpocock/skills) `grilling` skill (MIT).
 
 ### 🧭 [Guide Me](./guide-me)
 
