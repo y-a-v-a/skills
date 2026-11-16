@@ -1,0 +1,32 @@
+<!-- Example from the Mould project (social preview, Oct 2026). Layers: two canvases from hyphae.js (a blurred, dim depth layer and the sharp layer), then the mould PNG (layers/hyphae-mould.png) on top. Render with shot.sh (sets --allow-file-access-from-files). -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+.card{background:radial-gradient(900px 640px at 92% 70%, #1a1d17 0%, #0b0d0b 55%, #060706 100%)}
+canvas.layer{width:1280px;height:640px}
+.menubar{background:rgba(30,32,30,.55);color:rgba(255,255,255,.85)}
+.text{position:absolute;left:64px;top:96px;width:560px;color:#fff}
+h1{margin:0;font-size:156px;line-height:.92;font-weight:800;letter-spacing:-6px;color:#f4f6f0;text-shadow:0 8px 40px rgba(0,0,0,.6)}
+p{margin:26px 0 0;font-size:43px;line-height:1.14;font-weight:600;letter-spacing:-.4px;color:rgba(236,240,232,.78)}
+.key{color:#eef0ea;background:linear-gradient(#34383a,#222527);
+  box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 1px 0 rgba(255,255,255,.16) inset,0 3px 0 #050606,0 10px 20px rgba(0,0,0,.5)}
+.keys .label{color:rgba(236,240,232,.78)}
+.by{position:absolute;left:64px;bottom:58px;font-size:28px;font-weight:600;color:rgba(236,240,232,.55)}
+</style></head><body><div class="card">
+<canvas class="layer" id="deep" style="filter:blur(2.5px);opacity:.5"></canvas>
+<canvas class="layer" id="hy"></canvas>
+<img class="layer" src="../layers/hyphae-mould.png">
+<div class="menubar">
+ <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="6.5" cy="6.5" r="2.2" fill="currentColor"/><circle cx="11.5" cy="11.5" r="2" fill="currentColor"/><circle cx="12" cy="6" r="1.5" fill="currentColor"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/></svg>
+ <span>Sat 14:02</span></div>
+<div class="text"><h1>Mould</h1>
+<p>A macOS app that<br>slowly grows mould<br>over your screen.</p>
+<div class="keys"><span class="key">⌃</span><span class="key">⌥</span><span class="key">⌘</span><span class="key">M</span><span class="label">wipes it off</span></div></div>
+<div class="by">Vincent Bruijn</div>
+</div>
+<script src="hyphae.js"></script>
+<script>
+const colonies=[{x:1190,y:575,r:190},{x:1222,y:168,r:112},{x:935,y:402,r:68},{x:868,y:150,r:30}];
+growHyphae(document.getElementById('deep'), [{x:1100,y:330,r:150},{x:1280,y:620,r:120}], {seed:5, reach:3.2, tail:2.2, perR:0.9, branch:0.012, maxDens:2, maxSegs:120000, brush:0.0, glow:8, a0:.12, a1:.2});
+growHyphae(document.getElementById('hy'), colonies, {seed:11, reach:3.4, tail:2.6, perR:2.4, branch:0.016, maxDens:3.0, maxSegs:340000, brush:0.03, glow:6, glowAlpha:1.0});
+</script>
+</body></html>

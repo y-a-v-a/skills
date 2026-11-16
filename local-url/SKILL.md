@@ -1,6 +1,6 @@
 ---
 name: local-url
-description: Give a locally served web app a bookmarkable address like http://<app>.localhost:<port>, with no /etc/hosts entry and no sudo, while every address that already worked (127.0.0.1, localhost, a Tailscale serve URL) keeps working. Use when the user wants a local URL, a nicer name than localhost:port, something to bookmark or favorite for a dev server or always-on local app, or invokes /local-url.
+description: Give a locally served web app a bookmarkable address like http://myapp.localhost:3000, with no /etc/hosts entry and no sudo on macOS, while every address that already worked (127.0.0.1, localhost, a Tailscale serve URL) keeps working. Use when the user wants a local URL, a nicer name than localhost:port, something to bookmark or favorite for a dev server or always-on local app, or invokes /local-url.
 license: MIT
 metadata:
   author: Vincent Bruijn
@@ -31,14 +31,21 @@ The server keeps its bind address and port; nothing that worked before stops wor
 2. **Ask the machine before touching code:**
    ```bash
    dscacheutil -q host -a name <name>.localhost    # macOS: expect 127.0.0.1 and ::1
-   getent hosts <name>.localhost                   # Linux; if empty, the user adds
-                                                   # "127.0.0.1 <name>.localhost" to /etc/hosts
+   getent hosts <name>.localhost                   # Linux, see below if empty
    curl -s -o /dev/null -w '%{http_code}\n' http://<name>.localhost:<port>/
    ```
    - 200: it already works; skip to step 5.
    - 400, 403, "Invalid Host header", "Blocked request": a host allow-list; step 3.
    - Connection refused: nothing listens on the address the name resolved to; see
      Pitfalls.
+
+   Resolution: on macOS the system resolver answers `*.localhost` itself. On Linux it
+   depends on the NSS setup: `nss-myhostname` (systemd) resolves it, plain
+   glibc does not. If `getent` prints nothing, the "no /etc/hosts" promise
+   does not hold on this machine: tell the user, and offer the one-line
+   `127.0.0.1 <name>.localhost` entry (it needs sudo) rather than adding it
+   yourself. Chrome and Firefox resolve `*.localhost` on their own either
+   way, so a bookmark in those browsers still works without it.
 
 3. **Admit the exact name** (not a `*.localhost` wildcard) wherever hosts are checked:
    - Custom middleware: grep for `headers.host`, `allowedHosts`, `Host header`.
@@ -49,9 +56,13 @@ The server keeps its bind address and port; nothing that worked before stops wor
      `CSRF_TRUSTED_ORIGINS`), OAuth redirect URIs, cookie `Domain` attributes.
    Prefer one exported constant for the name over repeating the string.
 
-4. **Test the guard** in the project's own test style: the name passes, a sibling
-   (`other.localhost:<port>`) is refused, and if mutations check Origin, the same
-   pair for the origin. Run the full suite and the typecheck.
+4. **Test the guard, if the project owns it.** When step 3 changed custom
+   host-checking code (middleware, an allow-list helper), add tests in the
+   project's own style: the name passes, a sibling (`other.localhost:<port>`) is
+   refused, and if mutations check Origin, the same pair for the origin. Then run
+   the full suite and the typecheck. When step 3 only set a framework option
+   (Vite `allowedHosts`, Django `ALLOWED_HOSTS`), there's no code of yours to
+   test: the curl checks in step 6 cover it.
 
 5. **Make it the address the project prints**: startup log, any `--open`, README,
    CLAUDE.md or other agent instructions, service-file comments. Mention that the old

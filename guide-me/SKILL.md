@@ -1,6 +1,6 @@
 ---
 name: guide-me
-description: Walk the user step by step through a manual task in a web dashboard or backoffice (Vercel, the Claude Console, AWS, Google Cloud, GitHub settings, a DNS registrar, Stripe, an app store console) until they reach a stated destination, one step at a time, checking what they see after each step. Use when the user says "guide me", "walk me through", "where do I click", "how do I do X in the <service> dashboard", needs to do something by hand in a UI the agent cannot operate, or invokes /guide-me.
+description: Walk the user step by step through a manual task in a web dashboard or backoffice (Vercel, the Claude Console, AWS, Google Cloud, GitHub settings, a DNS registrar, Stripe, an app store console) until they reach a stated destination, one step at a time, checking what they see after each step. Use when the user says "guide me", "walk me through", "where do I click", "how do I do X in the Vercel dashboard" (or any other service's), needs to do something by hand in a UI the agent cannot operate, or invokes /guide-me.
 license: MIT
 metadata:
   author: Vincent Bruijn
@@ -26,7 +26,7 @@ Before giving the first step, be sure of three things. Find each one yourself fi
 
 If the task has prerequisites, check them before step 1: the role or permission it needs (owner, admin, billing), an existing resource, a paid plan, a verified domain. Being told "you need to be an Owner" on step 7 is a failure of preparation.
 
-Ask any questions you have one at a time, and give your recommended answer with each.
+Ask about **decisions** one at a time, each with your recommended answer: a later decision often depends on an earlier one. Plain **inputs** that don't depend on each other (a project name, a region, a plan tier) can go together in one message, up to four, so collecting them doesn't cost a round trip each.
 
 ## 2. Check the current UI, not your memory
 
@@ -50,7 +50,6 @@ Then give exactly one step per message, in this shape:
 ```
 **Step 2 of ~5: open the project settings**
 
-Where you should be: the shop-web project overview, with the deployment list in the middle.
 Do: click **Settings** in the tab bar at the top of the project.
 You should now see: a left sidebar starting with General, with Environment Variables a few items down.
 
@@ -60,6 +59,7 @@ Reply "done", or tell me what you see instead.
 Rules for steps:
 
 - **One screen per step.** One step is the set of actions on a single page or dialog. Never combine two pages in one step.
+- **Re-anchor after a detour.** The previous step's checkpoint already says where the user is, so a normal step starts with **Do:**. After a mismatch, a pause, or a correction, start the next step with **Where you should be:** (the screen and a landmark on it), so you both agree on the starting point again.
 - **Use the UI's exact words**, in bold, as they appear on the button, tab or menu item. Name a landmark when a label is ambiguous ("the **Settings** in the project tab bar, not the one in your avatar menu").
 - **Put values in code blocks** so they can be copied exactly: names, URLs, DNS records, JSON, and policy snippets. For a form, list every field you want changed and say to leave the rest at their defaults.
 - **End every step with a checkpoint**: what they should see if it worked. The checkpoint is how you both find out that you have gone off course.

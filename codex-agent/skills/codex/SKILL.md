@@ -7,13 +7,18 @@ metadata:
   author-url: https://vincentbruijn.nl
 argument-hint: "[task description]"
 disable-model-invocation: true
-allowed-tools: Bash(codex *), Read, Glob, Grep
+allowed-tools: Bash(codex *), Bash(mktemp *), Read, Write, Glob, Grep
 hooks:
   PreToolUse:
     - matcher: Bash
       hooks:
+        # Hooks run in the session's cwd, not the skill dir, so a relative path
+        # never resolves. CLAUDE_PLUGIN_ROOT holds the skill dir in skill hooks;
+        # the second path is the standard install location. If neither has the
+        # script, block codex commands only (fail closed without locking up Bash).
         - type: command
-          command: bash scripts/validate-codex-command.sh
+          command: 'for d in "$CLAUDE_PLUGIN_ROOT" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/codex"; do [ -f "$d/scripts/validate-codex-command.sh" ] && exec bash "$d/scripts/validate-codex-command.sh"; done; grep -q codex && { echo "Blocked: codex validation hook script not found; reinstall the codex skill." >&2; exit 2; }; exit 0'
+          onFailure: block
 ---
 
 You are a specialized skill that delegates coding tasks to OpenAI Codex via the Codex CLI.
@@ -56,13 +61,17 @@ sees:
 
 ## Command Reference
 
-Embed the brief into the **single** prompt argument. Never rely on a bare
-one-line task string (it strands the context you gathered) or a second
-positional argument (`codex exec` consumes one prompt):
+Hand Codex the brief file as its **whole** prompt, on stdin (`-`). Never rely
+on a bare one-line task string (it strands the context you gathered) or a
+second positional argument (`codex exec` consumes one prompt). Don't inline the
+brief with `"$(cat …)"` either: Linux caps a single argument at 128 KB, and a
+brief with real code excerpts gets there.
 
 ```bash
-# Write the brief to a file, then hand it to Codex as the whole prompt.
-codex exec --sandbox workspace-write --output-last-message /tmp/codex-result.txt "$(cat /tmp/codex-brief.md)"
+# Fresh per run: fixed /tmp names collide between concurrent sessions.
+D="$(mktemp -d)"
+# Write the brief to "$D/brief.md" (Write tool), then:
+codex exec --sandbox workspace-write --output-last-message "$D/result.txt" - < "$D/brief.md"
 ```
 
 ### Recommended Flags
@@ -75,12 +84,12 @@ codex exec --sandbox workspace-write --output-last-message /tmp/codex-result.txt
 | `--model <model>` | Override model |
 | `--sandbox <policy>` | read-only, workspace-write, danger-full-access |
 | `--cd <dir>` | Set working directory |
-| `--search` | Enable web search |
+| `--search` | Enable web search. **Global flag:** goes before `exec` (`codex --search exec …`); `codex exec --search` is rejected |
 
 ## Best Practices
 
 - Use `--sandbox workspace-write` for most tasks
-- Always pass `--output-last-message /tmp/codex-result.txt` so the result is captured and verifiable
+- Always pass `--output-last-message "$D/result.txt"` so the result is captured and verifiable
 - Put gathered context *in the brief* — file paths and excerpts in the prompt beat a vague task description every time
 - Don't trust Codex's summary on its face — verify file changes with `git diff` or by reading the modified files before reporting
 

@@ -1,0 +1,23 @@
+<!-- Example from the Mould project (social preview, Oct 2026). Layers: bg/agar.png (agar.metal mode 0), layers/agar-mould.png clipped to the dish, SVG textPath marker label on the rim, bg/agar-lid.png (agar.metal mode 1, glass overlay on top). -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=block" rel="stylesheet">
+<style>
+.card{background:#0b0e12}
+.text{position:absolute;left:64px;top:92px;width:470px;color:#fff}
+h1{margin:0;font-size:156px;line-height:.92;font-weight:800;letter-spacing:-6px;color:#fff6ea;
+   text-shadow:0 10px 40px rgba(0,0,0,.5)}
+p{margin:26px 0 0;font-size:41px;line-height:1.16;font-weight:600;letter-spacing:-.4px;color:rgba(255,246,234,.82)}
+.key{color:#f4eee6;background:linear-gradient(#3a3f46,#262a30);
+  box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 1px 0 rgba(255,255,255,.18) inset,0 3px 0 #0a0c0f,0 10px 20px rgba(0,0,0,.45)}
+.keys .label{color:rgba(255,246,234,.82)}
+.by{position:absolute;left:64px;bottom:58px;font-size:28px;font-weight:600;color:rgba(255,246,234,.6)}
+</style></head><body><div class="card">
+<img class="layer" src="../bg/agar.png">
+<img class="layer" src="../layers/agar-mould.png" style="clip-path:circle(385px at 925px 330px)">
+<svg class="layer" viewBox="0 0 1280 640"><defs><path id="arc" d="M 925 330 m -352 0 a 352 352 0 0 0 352 352" /></defs><text font-family="Permanent Marker" font-size="27" fill="rgba(28,18,12,.8)" letter-spacing="1.5"><textPath href="#arc" startOffset="14%">my screen · 45 min</textPath></text></svg>
+<img class="layer" src="../bg/agar-lid.png">
+<div class="text"><h1>Mould</h1>
+<p>A macOS app that<br>slowly grows mould<br>over your screen.</p>
+<div class="keys"><span class="key">⌃</span><span class="key">⌥</span><span class="key">⌘</span><span class="key">M</span><span class="label">wipes it off</span></div></div>
+<div class="by">Vincent Bruijn</div>
+</div></body></html>

@@ -14,10 +14,6 @@ Three skills that bring the [OpenAI Codex CLI](https://developers.openai.com/cod
 
 The repo also includes `codex-validate`, a project-local skill that tests the three skills against a live Codex CLI. It is not linked globally.
 
-### 🔍 [Google Programmable Search Engine](./gpse-skill)
-
-- **`/google-search`** — Search the web through Google's Custom Search API, with date, site, exact-phrase, and exclusion filters plus pagination. Plain Node.js, no dependencies. Needs an API key and search engine ID (free tier: 100 queries/day).
-
 ### 🧐 [Stern Code Review](./stern-code-review)
 
 - **`/stern-code-review`** — A blunt, senior-level review focused on correctness, data safety, security, and production risk. Ends in a verdict (`approve` / `approve with fixes` / `request changes` / `reject`), the tests that should exist, and the minimal acceptable fix.
@@ -28,11 +24,11 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 🖼️ [HTML Export](./html)
 
-- **`/html`** — Export the current state of the session (work done, findings, data) to a self-contained `index.html`. The agent picks what is worth showing, and it never overwrites a file (`index1.html`, `index2.html`, …).
+- **`/html`** — Export the current state of the session (work done, findings, data) to a self-contained HTML file named after its content and date (`<topic>-<date>.html`). The agent picks what is worth showing, keeps secrets out of the page, writes outside served web directories, and never overwrites a file.
 
 ### 🔥 [Grill Me](./grill-me)
 
-- **`/grill-me`** — Get interviewed about a plan or design, one question at a time, each with a recommended answer, until you reach shared understanding. Questions the codebase can answer get answered from the codebase.
+- **`/grill-me`** — Get interviewed about a plan or design until you reach shared understanding. Asks every question that can be answered now in one numbered round, each with a recommended answer that "yes" accepts; facts it can look up, it looks up. Ends with a decision list. Adapted from [Matt Pocock's](https://github.com/mattpocock/skills) `grilling` skill (MIT).
 
 ### 🧭 [Guide Me](./guide-me)
 
@@ -44,7 +40,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 📸 [Social Preview](./social-preview)
 
-- **`/social-preview`** — Create a 1280×640 GitHub social preview PNG in the project's own style, screenshot it with headless Chrome, and iterate until you approve. See [explainer.html](./social-preview/explainer.html).
+- **`/social-preview`** — Create a 1280×640 GitHub social preview PNG (under 1 MB): several distinct concepts built around the project's real visual, procedural backgrounds (Metal on macOS, WebGL2 elsewhere), critique at full and half size, and iteration until you approve. Techniques are in [craft.md](./social-preview/craft.md); [explainer.html](./social-preview/explainer.html) covers the first version.
 
 ### 🚀 [Ambitious](./ambitious)
 
@@ -52,7 +48,7 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 📦 [Scpush](./scpush)
 
-- **`/scpush`** — Minimal stage, commit, and push: stages only files that belong to the current work, commits in the style of the recent log, and reports the hash. The lightweight counterpart of `/gg`.
+- **`/scpush`** — Minimal stage, commit, and push: stages only files that belong to the current work, commits in the style of the recent log, and reports the hash. Runs only when you type `/scpush`; in conversation, "commit and push" goes to `/gg`.
 
 ### 🚢 [gg](./gg)
 
@@ -60,19 +56,19 @@ The repo also includes `codex-validate`, a project-local skill that tests the th
 
 ### 🔐 [Scan Secrets](./scan-secrets)
 
-- **`/scan-secrets`** — Find plaintext secrets (cloud keys, API tokens, passwords, private keys) in a repository. Uses a built-in Node.js scanner, plus [gitleaks](https://github.com/gitleaks/gitleaks) for gitignored files and the full git history when it is installed. Read-only, and every value in the output is masked.
+- **`/scan-secrets`** — Find plaintext secrets (cloud keys, API tokens, passwords, private keys) in a repository. Uses a built-in Node.js scanner, plus [gitleaks](https://github.com/gitleaks/gitleaks) for gitignored files and the full git history when it is installed. Read-only, and every value in the output is masked. Fixture tests: `node --test scan-secrets/tests/scan-secrets.test.js`.
 
 ### ✉️ [Sendmail](./sendmail)
 
 - **`/sendmail`** — Draft an email in Outlook on macOS, e.g. `/sendmail kim@example.com ask Kim for the Q3 numbers`. The text is used as the body verbatim or as an instruction to write one, and the subject is derived from it. Opens the draft for review; never sends.
 
-### 🧹 [Purge](./purge)
+### 🧹 [Flushcache](./flushcache)
 
 - **`/flushcache`** — Purge Akamai edge cache for URLs, CP codes, or cache tags through the [Akamai CLI](https://github.com/akamai/cli). Invalidates on production by default (`--staging`, `--delete` to change that), checks credentials first, and asks before broad purges.
 
 ### ⚡ [JFDI](./jfdi)
 
-- **`/jfdi`** — "Just do it": work autonomously to a high standard. Decides from verified facts instead of asking, finishes and verifies the whole job, and only stops for destructive, outward-facing, or security-related steps. Critical decisions go into an ADR or `DECISIONS.md`.
+- **`/jfdi`** — "Just do it": work autonomously to a high standard. Runs only when you type `/jfdi`. Decides from verified facts instead of asking, finishes and verifies the whole job, and only stops for destructive, outward-facing, or security-related steps. Critical decisions go into an ADR or `DECISIONS.md`.
 
 ### 🔗 [Local URL](./local-url)
 
@@ -85,9 +81,16 @@ Use `link-skill.sh` to symlink skills from this repo into `~/.claude/skills`:
 ```bash
 ./link-skill.sh --all      # link every skill
 ./link-skill.sh html       # link just one skill
+./link-skill.sh --check    # report drift: links pointing elsewhere, real dirs shadowing a repo skill, dangling links
 ```
 
-Each skill is linked under its own name (e.g. `~/.claude/skills/html`), taken from the skill's `name:` frontmatter, so nested skills like `codex` and `google-search` land under the right name. Pass `--force` to replace an existing entry, and set `CLAUDE_SKILLS_DIR` to target a different directory.
+Each skill is linked under its own name (e.g. `~/.claude/skills/html`), taken from the skill's `name:` frontmatter, so nested skills like `codex` (in `codex-agent/skills/codex`) land under the right name. Pass `--force` to replace an existing entry, and set `CLAUDE_SKILLS_DIR` to target a different directory.
+
+## Testing
+
+- **Routing:** `node evals/run-triggers.js` checks that each skill's description loads it for the prompts it should handle, and not for near misses (cases in [`evals/triggers.json`](./evals/triggers.json)). Each case is a headless `claude -p` run with every tool except Skill disabled, so nothing gets executed. `--skill <name>` runs one skill's cases. A same-named skill in `~/.claude/skills` shadows the repo copy, so run `./link-skill.sh --check` first.
+- **scan-secrets:** `node --test scan-secrets/tests/scan-secrets.test.js`
+- **codex skills:** `/codex-validate` from inside `codex-agent/` (hooks, wiring, CLI drift, live smoke tests).
 
 ## Author
 
